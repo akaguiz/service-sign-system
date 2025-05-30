@@ -7,33 +7,14 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
 import { ArrowLeft, Search, Plus, Eye, Edit, Printer } from "lucide-react";
+import { useOS } from "@/contexts/OSContext";
 
 const OSList = () => {
   const [searchName, setSearchName] = useState("");
   const [searchCpf, setSearchCpf] = useState("");
+  const { searchOS } = useOS();
 
-  // Dados de exemplo
-  const osList = [
-    {
-      id: 1,
-      colaborador: "João Silva",
-      cpf: "123.456.789-00",
-      empresa: "Empresa A",
-      status: "pendente"
-    },
-    {
-      id: 2,
-      colaborador: "Maria Santos",
-      cpf: "987.654.321-00",
-      empresa: "Empresa B",
-      status: "assinada"
-    }
-  ];
-
-  const filteredOS = osList.filter(os => 
-    os.colaborador.toLowerCase().includes(searchName.toLowerCase()) &&
-    os.cpf.includes(searchCpf)
-  );
+  const filteredOS = searchOS(searchName, searchCpf);
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -123,9 +104,11 @@ const OSList = () => {
                       </td>
                       <td className="py-3 px-4">
                         <div className="flex space-x-2">
-                          <Button size="sm" variant="outline" title="Visualizar">
-                            <Eye className="w-4 h-4" />
-                          </Button>
+                          <Link to={`/admin/os/view/${os.id}`}>
+                            <Button size="sm" variant="outline" title="Visualizar">
+                              <Eye className="w-4 h-4" />
+                            </Button>
+                          </Link>
                           <Link to={`/admin/os/edit/${os.id}`}>
                             <Button size="sm" variant="outline" title="Editar">
                               <Edit className="w-4 h-4" />

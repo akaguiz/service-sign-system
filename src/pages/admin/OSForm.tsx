@@ -1,5 +1,5 @@
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -8,10 +8,12 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { ArrowLeft, Save } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
+import { useOS } from "@/contexts/OSContext";
 
 const OSForm = () => {
   const navigate = useNavigate();
   const { id } = useParams();
+  const { addOS, updateOS, getOSById } = useOS();
   const isEditing = !!id;
 
   const [formData, setFormData] = useState({
@@ -29,18 +31,59 @@ const OSForm = () => {
     dataEmissao: new Date().toISOString().split('T')[0]
   });
 
+  useEffect(() => {
+    if (isEditing && id) {
+      const os = getOSById(id);
+      if (os) {
+        setFormData({
+          empresa: os.empresa,
+          colaborador: os.colaborador,
+          cpf: os.cpf,
+          funcao: os.funcao,
+          riscos: os.riscos,
+          epis: os.epis,
+          obrigacoes: os.obrigacoes,
+          proibicoes: os.proibicoes,
+          penalidades: os.penalidades,
+          termoRecebimento: os.termoRecebimento,
+          procedimentosAcidente: os.procedimentosAcidente,
+          dataEmissao: os.dataEmissao
+        });
+      }
+    }
+  }, [isEditing, id, getOSById]);
+
   const handleInputChange = (field: string, value: string) => {
     setFormData(prev => ({ ...prev, [field]: value }));
+  };
+
+  const formatCPF = (value: string) => {
+    const numbers = value.replace(/\D/g, '');
+    const formatted = numbers
+      .replace(/(\d{3})(\d)/, '$1.$2')
+      .replace(/(\d{3})(\d)/, '$1.$2')
+      .replace(/(\d{3})(\d{1,2})/, '$1-$2')
+      .replace(/(-\d{2})\d+?$/, '$1');
+    
+    handleInputChange("cpf", formatted);
   };
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     
-    // Simular salvamento
-    toast({
-      title: isEditing ? "OS atualizada com sucesso!" : "OS criada com sucesso!",
-      description: "A ordem de serviço foi salva no sistema.",
-    });
+    if (isEditing && id) {
+      updateOS(id, formData);
+      toast({
+        title: "OS atualizada com sucesso!",
+        description: "A ordem de serviço foi atualizada no sistema.",
+      });
+    } else {
+      addOS(formData);
+      toast({
+        title: "OS criada com sucesso!",
+        description: "A ordem de serviço foi criada e vinculada ao CPF informado.",
+      });
+    }
     
     navigate("/admin/os");
   };
@@ -108,8 +151,9 @@ const OSForm = () => {
                   <Input
                     id="cpf"
                     value={formData.cpf}
-                    onChange={(e) => handleInputChange("cpf", e.target.value)}
+                    onChange={(e) => formatCPF(e.target.value)}
                     placeholder="000.000.000-00"
+                    maxLength={14}
                     required
                   />
                 </div>

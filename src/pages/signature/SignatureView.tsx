@@ -3,33 +3,57 @@ import { useState } from "react";
 import { useParams, Link } from "react-router-dom";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
 import { ArrowLeft, CheckCircle } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
+import { useOS } from "@/contexts/OSContext";
+import SignatureCanvas from "@/components/SignatureCanvas";
 
 const SignatureView = () => {
   const { cpf } = useParams();
+  const { getOSByCPF, updateOS } = useOS();
   const [confirmRead, setConfirmRead] = useState(false);
   const [signature, setSignature] = useState("");
   const [isSigning, setIsSigning] = useState(false);
 
-  // Dados de exemplo da OS
-  const osData = {
-    empresa: "Empresa A Ltda",
-    colaborador: "João Silva",
-    cpf: cpf,
-    funcao: "Técnico de Segurança",
-    riscos: "Trabalho em altura, exposição a ruído, manuseio de equipamentos",
-    epis: "Capacete, óculos de proteção, luvas, calçado de segurança, protetor auricular",
-    obrigacoes: "Utilizar EPIs obrigatórios, seguir procedimentos de segurança, reportar incidentes",
-    proibicoes: "Não utilizar equipamentos sem treinamento, não remover proteções de segurança",
-    penalidades: "Advertência verbal, advertência escrita, suspensão, demissão por justa causa",
-    termoRecebimento: "Declaro ter recebido e compreendido todas as orientações de segurança",
-    procedimentosAcidente: "Comunicar imediatamente o supervisor, buscar atendimento médico se necessário",
-    dataEmissao: "2024-05-30"
-  };
+  const osData = cpf ? getOSByCPF(cpf) : undefined;
+
+  if (!osData) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <Card className="max-w-md">
+          <CardContent className="p-6 text-center">
+            <h2 className="text-2xl font-bold text-gray-800 mb-2">OS não encontrada</h2>
+            <p className="text-gray-600 mb-4">Não foi encontrada nenhuma OS vinculada a este CPF.</p>
+            <Link to="/signature">
+              <Button className="bg-primary hover:bg-primary-hover">
+                Voltar
+              </Button>
+            </Link>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
+
+  if (osData.status === 'assinada') {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <Card className="max-w-md">
+          <CardContent className="p-6 text-center">
+            <CheckCircle className="w-16 h-16 text-green-600 mx-auto mb-4" />
+            <h2 className="text-2xl font-bold text-gray-800 mb-2">Documento já assinado</h2>
+            <p className="text-gray-600 mb-4">Esta OS já foi assinada em {osData.dataAssinatura ? new Date(osData.dataAssinatura).toLocaleDateString('pt-BR') : 'data não informada'}.</p>
+            <Link to="/signature">
+              <Button className="bg-primary hover:bg-primary-hover">
+                Voltar
+              </Button>
+            </Link>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
 
   const handleSign = async () => {
     if (!confirmRead || !signature.trim()) {
@@ -45,6 +69,12 @@ const SignatureView = () => {
 
     // Simular processo de assinatura
     setTimeout(() => {
+      updateOS(osData.id, {
+        status: 'assinada',
+        assinatura: signature,
+        dataAssinatura: new Date().toISOString().split('T')[0]
+      });
+
       toast({
         title: "Documento assinado com sucesso!",
         description: "Sua assinatura foi registrada no sistema.",
@@ -90,7 +120,6 @@ const SignatureView = () => {
               </div>
             </div>
 
-            {/* Conteúdo da OS */}
             <div className="space-y-4">
               <div>
                 <h3 className="font-semibold text-lg text-gray-800 mb-2">Riscos Identificados</h3>
@@ -142,19 +171,17 @@ const SignatureView = () => {
                 checked={confirmRead}
                 onCheckedChange={(checked) => setConfirmRead(checked as boolean)}
               />
-              <Label htmlFor="confirmRead" className="text-sm">
+              <label htmlFor="confirmRead" className="text-sm">
                 Confirmo que li e compreendi todas as informações contidas neste documento
-              </Label>
+              </label>
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="signature">Assinatura Digital</Label>
-              <Input
-                id="signature"
-                placeholder="Digite seu nome completo como assinatura"
-                value={signature}
-                onChange={(e) => setSignature(e.target.value)}
-                disabled={!confirmRead}
+              <label className="text-sm font-medium">Assinatura Digital</label>
+              <SignatureCanvas 
+                onSignatureChange={setSignature}
+                width={400}
+                height={150}
               />
             </div>
 
