@@ -2,7 +2,7 @@
 import { Link } from "react-router-dom";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { FileText, FileTemplate, LogOut, Search, Plus } from "lucide-react";
+import { FileText, File, LogOut, Search, Plus } from "lucide-react";
 
 const AdminDashboard = () => {
   return (
@@ -53,7 +53,7 @@ const AdminDashboard = () => {
           <Card className="hover:shadow-lg transition-shadow">
             <CardHeader className="text-center pb-4">
               <div className="w-16 h-16 bg-primary rounded-full flex items-center justify-center mx-auto mb-4">
-                <FileTemplate className="w-8 h-8 text-white" />
+                <File className="w-8 h-8 text-white" />
               </div>
               <CardTitle className="text-2xl text-gray-800">Modelos</CardTitle>
               <CardDescription>
