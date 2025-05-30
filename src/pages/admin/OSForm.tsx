@@ -1,0 +1,220 @@
+
+import { useState } from "react";
+import { Link, useNavigate, useParams } from "react-router-dom";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
+import { ArrowLeft, Save } from "lucide-react";
+import { toast } from "@/hooks/use-toast";
+
+const OSForm = () => {
+  const navigate = useNavigate();
+  const { id } = useParams();
+  const isEditing = !!id;
+
+  const [formData, setFormData] = useState({
+    empresa: "",
+    colaborador: "",
+    cpf: "",
+    funcao: "",
+    riscos: "",
+    epis: "",
+    obrigacoes: "",
+    proibicoes: "",
+    penalidades: "",
+    termoRecebimento: "",
+    procedimentosAcidente: "",
+    dataEmissao: new Date().toISOString().split('T')[0]
+  });
+
+  const handleInputChange = (field: string, value: string) => {
+    setFormData(prev => ({ ...prev, [field]: value }));
+  };
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    
+    // Simular salvamento
+    toast({
+      title: isEditing ? "OS atualizada com sucesso!" : "OS criada com sucesso!",
+      description: "A ordem de serviço foi salva no sistema.",
+    });
+    
+    navigate("/admin/os");
+  };
+
+  return (
+    <div className="min-h-screen bg-gray-50">
+      {/* Header */}
+      <header className="bg-primary shadow-sm">
+        <div className="container mx-auto px-4 py-4 flex items-center justify-between">
+          <div className="flex items-center">
+            <Link to="/admin/os" className="mr-4">
+              <Button variant="outline" size="sm" className="text-primary border-white hover:bg-white">
+                <ArrowLeft className="w-4 h-4" />
+              </Button>
+            </Link>
+            <h1 className="text-2xl font-bold text-white">
+              {isEditing ? "Editar" : "Nova"} Ordem de Serviço
+            </h1>
+          </div>
+        </div>
+      </header>
+
+      <div className="container mx-auto px-4 py-8 max-w-4xl">
+        <form onSubmit={handleSubmit}>
+          <Card>
+            <CardHeader>
+              <CardTitle>Informações da Ordem de Serviço</CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-6">
+              {/* Dados básicos */}
+              <div className="grid md:grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label htmlFor="empresa">Empresa *</Label>
+                  <Input
+                    id="empresa"
+                    value={formData.empresa}
+                    onChange={(e) => handleInputChange("empresa", e.target.value)}
+                    required
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="dataEmissao">Data de Emissão *</Label>
+                  <Input
+                    id="dataEmissao"
+                    type="date"
+                    value={formData.dataEmissao}
+                    onChange={(e) => handleInputChange("dataEmissao", e.target.value)}
+                    required
+                  />
+                </div>
+              </div>
+
+              <div className="grid md:grid-cols-3 gap-4">
+                <div className="space-y-2">
+                  <Label htmlFor="colaborador">Nome do Colaborador *</Label>
+                  <Input
+                    id="colaborador"
+                    value={formData.colaborador}
+                    onChange={(e) => handleInputChange("colaborador", e.target.value)}
+                    required
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="cpf">CPF *</Label>
+                  <Input
+                    id="cpf"
+                    value={formData.cpf}
+                    onChange={(e) => handleInputChange("cpf", e.target.value)}
+                    placeholder="000.000.000-00"
+                    required
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="funcao">Função *</Label>
+                  <Input
+                    id="funcao"
+                    value={formData.funcao}
+                    onChange={(e) => handleInputChange("funcao", e.target.value)}
+                    required
+                  />
+                </div>
+              </div>
+
+              {/* Campos de texto */}
+              <div className="space-y-4">
+                <div className="space-y-2">
+                  <Label htmlFor="riscos">Riscos</Label>
+                  <Textarea
+                    id="riscos"
+                    value={formData.riscos}
+                    onChange={(e) => handleInputChange("riscos", e.target.value)}
+                    rows={3}
+                  />
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="epis">Equipamentos de Proteção (EPIs)</Label>
+                  <Textarea
+                    id="epis"
+                    value={formData.epis}
+                    onChange={(e) => handleInputChange("epis", e.target.value)}
+                    rows={3}
+                  />
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="obrigacoes">Obrigações do Colaborador</Label>
+                  <Textarea
+                    id="obrigacoes"
+                    value={formData.obrigacoes}
+                    onChange={(e) => handleInputChange("obrigacoes", e.target.value)}
+                    rows={4}
+                  />
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="proibicoes">Proibições</Label>
+                  <Textarea
+                    id="proibicoes"
+                    value={formData.proibicoes}
+                    onChange={(e) => handleInputChange("proibicoes", e.target.value)}
+                    rows={4}
+                  />
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="penalidades">Penalidades</Label>
+                  <Textarea
+                    id="penalidades"
+                    value={formData.penalidades}
+                    onChange={(e) => handleInputChange("penalidades", e.target.value)}
+                    rows={3}
+                  />
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="termoRecebimento">Termo de Recebimento e Compromisso</Label>
+                  <Textarea
+                    id="termoRecebimento"
+                    value={formData.termoRecebimento}
+                    onChange={(e) => handleInputChange("termoRecebimento", e.target.value)}
+                    rows={4}
+                  />
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="procedimentosAcidente">Procedimentos em Caso de Acidente</Label>
+                  <Textarea
+                    id="procedimentosAcidente"
+                    value={formData.procedimentosAcidente}
+                    onChange={(e) => handleInputChange("procedimentosAcidente", e.target.value)}
+                    rows={4}
+                  />
+                </div>
+              </div>
+
+              <div className="flex justify-end space-x-4 pt-6">
+                <Link to="/admin/os">
+                  <Button variant="outline">Cancelar</Button>
+                </Link>
+                <Button 
+                  type="submit"
+                  className="bg-primary hover:bg-primary-hover text-white"
+                >
+                  <Save className="w-4 h-4 mr-2" />
+                  {isEditing ? "Atualizar" : "Salvar"} OS
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
+        </form>
+      </div>
+    </div>
+  );
+};
+
+export default OSForm;
