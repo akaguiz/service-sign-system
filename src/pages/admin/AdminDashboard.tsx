@@ -3,8 +3,16 @@ import { Link } from "react-router-dom";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { FileText, File, LogOut, Search, Plus } from "lucide-react";
+import { useOS } from "@/contexts/OSContext";
 
 const AdminDashboard = () => {
+  const { osList } = useOS();
+
+  // Calcular estatísticas
+  const pendingOS = osList.filter(os => os.status === 'pendente').length;
+  const signedOS = osList.filter(os => os.status === 'assinada').length;
+  const totalModels = 0; // Como não há contexto de modelos ainda, mantemos 0
+
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Header */}
@@ -33,7 +41,7 @@ const AdminDashboard = () => {
                 Gerenciar e visualizar todas as ordens de serviço
               </CardDescription>
             </CardHeader>
-            <CardContent className="space-y-3">
+            <CardContent className="space-y-4">
               <Link to="/admin/os">
                 <Button className="w-full bg-primary hover:bg-primary-hover text-white">
                   <Search className="w-4 h-4 mr-2" />
@@ -60,7 +68,7 @@ const AdminDashboard = () => {
                 Criar e gerenciar modelos de ordens de serviço
               </CardDescription>
             </CardHeader>
-            <CardContent className="space-y-3">
+            <CardContent className="space-y-4">
               <Link to="/admin/models">
                 <Button className="w-full bg-primary hover:bg-primary-hover text-white">
                   <Search className="w-4 h-4 mr-2" />
@@ -81,19 +89,19 @@ const AdminDashboard = () => {
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-8 max-w-4xl mx-auto">
           <Card>
             <CardContent className="p-6 text-center">
-              <div className="text-3xl font-bold text-primary">0</div>
+              <div className="text-3xl font-bold text-primary">{pendingOS}</div>
               <div className="text-gray-600">OS Pendentes</div>
             </CardContent>
           </Card>
           <Card>
             <CardContent className="p-6 text-center">
-              <div className="text-3xl font-bold text-green-600">0</div>
+              <div className="text-3xl font-bold text-green-600">{signedOS}</div>
               <div className="text-gray-600">OS Assinadas</div>
             </CardContent>
           </Card>
           <Card>
             <CardContent className="p-6 text-center">
-              <div className="text-3xl font-bold text-blue-600">0</div>
+              <div className="text-3xl font-bold text-blue-600">{totalModels}</div>
               <div className="text-gray-600">Modelos Criados</div>
             </CardContent>
           </Card>
