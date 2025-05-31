@@ -15,11 +15,13 @@ const OSList = () => {
   const [searchEmpresa, setSearchEmpresa] = useState("");
   const { osList } = useOS();
 
-  const filteredOS = osList.filter(os => 
-    os.colaborador.toLowerCase().includes(searchName.toLowerCase()) &&
-    os.cpf.includes(searchCpf) &&
-    os.empresa.toLowerCase().includes(searchEmpresa.toLowerCase())
-  );
+  const filteredOS = osList.filter(os => {
+    const nameMatch = searchName === "" || os.colaborador.toLowerCase().includes(searchName.toLowerCase());
+    const cpfMatch = searchCpf === "" || os.cpf.includes(searchCpf);
+    const empresaMatch = searchEmpresa === "" || os.empresa.toLowerCase().includes(searchEmpresa.toLowerCase());
+    
+    return nameMatch && cpfMatch && empresaMatch;
+  });
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -96,6 +98,7 @@ const OSList = () => {
                 <thead>
                   <tr className="border-b">
                     <th className="text-left py-3 px-4 font-semibold">Colaborador</th>
+                    <th className="text-left py-3 px-4 font-semibold">Função</th>
                     <th className="text-left py-3 px-4 font-semibold">CPF</th>
                     <th className="text-left py-3 px-4 font-semibold">Empresa</th>
                     <th className="text-left py-3 px-4 font-semibold">Status</th>
@@ -106,6 +109,7 @@ const OSList = () => {
                   {filteredOS.map((os) => (
                     <tr key={os.id} className="border-b hover:bg-gray-50">
                       <td className="py-3 px-4">{os.colaborador}</td>
+                      <td className="py-3 px-4">{os.funcao}</td>
                       <td className="py-3 px-4">{os.cpf}</td>
                       <td className="py-3 px-4">{os.empresa}</td>
                       <td className="py-3 px-4">

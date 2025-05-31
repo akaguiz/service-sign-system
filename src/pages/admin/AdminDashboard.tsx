@@ -29,8 +29,8 @@ const AdminDashboard = () => {
 
       <div className="container mx-auto px-4 py-8">
         <div className="flex justify-center">
-          {/* Seção OS - Centralizada */}
-          <Card className="hover:shadow-lg transition-shadow max-w-md w-full">
+          {/* Seção OS - Centralizada e com tamanho ajustado */}
+          <Card className="hover:shadow-lg transition-shadow w-full max-w-lg">
             <CardHeader className="text-center pb-4">
               <div className="w-16 h-16 bg-primary rounded-full flex items-center justify-center mx-auto mb-4">
                 <FileText className="w-8 h-8 text-white" />
@@ -40,21 +40,21 @@ const AdminDashboard = () => {
                 Gerenciar e visualizar todas as ordens de serviço
               </CardDescription>
             </CardHeader>
-            <CardContent className="space-y-3">
+            <CardContent className="space-y-4 px-8 pb-8">
               <Link to="/admin/os">
-                <Button className="w-full bg-primary hover:bg-primary-hover text-white">
+                <Button className="w-full bg-primary hover:bg-primary-hover text-white h-12">
                   <Search className="w-4 h-4 mr-2" />
                   Pesquisar OS
                 </Button>
               </Link>
               <Link to="/admin/os/new">
-                <Button variant="outline" className="w-full border-primary text-primary hover:bg-primary-light">
+                <Button variant="outline" className="w-full border-primary text-primary hover:bg-primary-light h-12">
                   <Plus className="w-4 h-4 mr-2" />
                   Nova OS
                 </Button>
               </Link>
               <Link to="/admin/os/config">
-                <Button variant="outline" className="w-full border-primary text-primary hover:bg-primary-light">
+                <Button variant="outline" className="w-full border-primary text-primary hover:bg-primary-light h-12">
                   <Settings className="w-4 h-4 mr-2" />
                   Configurar OS
                 </Button>
