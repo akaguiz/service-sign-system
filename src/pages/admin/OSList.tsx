@@ -12,9 +12,14 @@ import { useOS } from "@/contexts/OSContext";
 const OSList = () => {
   const [searchName, setSearchName] = useState("");
   const [searchCpf, setSearchCpf] = useState("");
-  const { searchOS } = useOS();
+  const [searchEmpresa, setSearchEmpresa] = useState("");
+  const { osList } = useOS();
 
-  const filteredOS = searchOS(searchName, searchCpf);
+  const filteredOS = osList.filter(os => 
+    os.colaborador.toLowerCase().includes(searchName.toLowerCase()) &&
+    os.cpf.includes(searchCpf) &&
+    os.empresa.toLowerCase().includes(searchEmpresa.toLowerCase())
+  );
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -48,7 +53,7 @@ const OSList = () => {
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="grid md:grid-cols-2 gap-4">
+            <div className="grid md:grid-cols-3 gap-4">
               <div className="space-y-2">
                 <Label htmlFor="searchName">Nome do Colaborador</Label>
                 <Input
@@ -65,6 +70,15 @@ const OSList = () => {
                   placeholder="Digite o CPF"
                   value={searchCpf}
                   onChange={(e) => setSearchCpf(e.target.value)}
+                />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="searchEmpresa">Empresa</Label>
+                <Input
+                  id="searchEmpresa"
+                  placeholder="Digite o nome da empresa"
+                  value={searchEmpresa}
+                  onChange={(e) => setSearchEmpresa(e.target.value)}
                 />
               </div>
             </div>
