@@ -2,7 +2,7 @@
 import { Link } from "react-router-dom";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { FileText, File, LogOut, Search, Plus } from "lucide-react";
+import { FileText, File, LogOut, Search, Plus, Settings } from "lucide-react";
 import { useOS } from "@/contexts/OSContext";
 
 const AdminDashboard = () => {
@@ -52,6 +52,12 @@ const AdminDashboard = () => {
                 <Button variant="outline" className="w-full border-primary text-primary hover:bg-primary-light">
                   <Plus className="w-4 h-4 mr-2" />
                   Nova OS
+                </Button>
+              </Link>
+              <Link to="/admin/os/config">
+                <Button variant="outline" className="w-full border-primary text-primary hover:bg-primary-light">
+                  <Settings className="w-4 h-4 mr-2" />
+                  Configurar OS
                 </Button>
               </Link>
             </CardContent>

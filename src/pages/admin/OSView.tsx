@@ -5,12 +5,15 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { ArrowLeft, FileText, User, Calendar, CheckCircle, Clock } from "lucide-react";
 import { useOS } from "@/contexts/OSContext";
+import { useOSConfig } from "@/contexts/OSConfigContext";
 
 const OSView = () => {
   const { id } = useParams();
   const { getOSById } = useOS();
+  const { getTemplateByEmpresa } = useOSConfig();
   
   const osData = id ? getOSById(id) : undefined;
+  const template = osData ? getTemplateByEmpresa(osData.empresa) : undefined;
 
   if (!osData) {
     return (
@@ -29,6 +32,42 @@ const OSView = () => {
       </div>
     );
   }
+
+  const getFieldLabel = (fieldId: string) => {
+    const field = template?.fields.find(f => f.id === fieldId);
+    return field?.label || fieldId;
+  };
+
+  const isFieldVisible = (fieldId: string) => {
+    if (!template) return true; // Se não há template, mostra todos os campos
+    const field = template.fields.find(f => f.id === fieldId);
+    return field?.visible !== false;
+  };
+
+  const renderField = (fieldId: string, value: any, icon?: React.ReactNode) => {
+    if (!isFieldVisible(fieldId) || !value) return null;
+
+    return (
+      <div className="flex items-center">
+        {icon}
+        <div>
+          <p className="text-sm text-gray-500">{getFieldLabel(fieldId)}</p>
+          <p className="font-semibold">{value}</p>
+        </div>
+      </div>
+    );
+  };
+
+  const renderDetailField = (fieldId: string, value: string) => {
+    if (!isFieldVisible(fieldId) || !value) return null;
+
+    return (
+      <div>
+        <h3 className="font-semibold text-lg text-gray-800 mb-2">{getFieldLabel(fieldId)}</h3>
+        <p className="text-gray-700 bg-gray-50 p-3 rounded">{value}</p>
+      </div>
+    );
+  };
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -73,27 +112,9 @@ const OSView = () => {
           </CardHeader>
           <CardContent>
             <div className="grid md:grid-cols-3 gap-4">
-              <div className="flex items-center">
-                <User className="w-5 h-5 mr-2 text-gray-500" />
-                <div>
-                  <p className="text-sm text-gray-500">Colaborador</p>
-                  <p className="font-semibold">{osData.colaborador}</p>
-                </div>
-              </div>
-              <div className="flex items-center">
-                <FileText className="w-5 h-5 mr-2 text-gray-500" />
-                <div>
-                  <p className="text-sm text-gray-500">CPF</p>
-                  <p className="font-semibold">{osData.cpf}</p>
-                </div>
-              </div>
-              <div className="flex items-center">
-                <Calendar className="w-5 h-5 mr-2 text-gray-500" />
-                <div>
-                  <p className="text-sm text-gray-500">Data de Emissão</p>
-                  <p className="font-semibold">{new Date(osData.dataEmissao).toLocaleDateString('pt-BR')}</p>
-                </div>
-              </div>
+              {renderField('colaborador', osData.colaborador, <User className="w-5 h-5 mr-2 text-gray-500" />)}
+              {renderField('cpf', osData.cpf, <FileText className="w-5 h-5 mr-2 text-gray-500" />)}
+              {renderField('dataEmissao', new Date(osData.dataEmissao).toLocaleDateString('pt-BR'), <Calendar className="w-5 h-5 mr-2 text-gray-500" />)}
             </div>
             
             {osData.status === 'assinada' && osData.dataAssinatura && (
@@ -111,47 +132,21 @@ const OSView = () => {
         <Card>
           <CardHeader>
             <CardTitle>Detalhes da Ordem de Serviço</CardTitle>
+            {template && (
+              <p className="text-sm text-gray-500">
+                Configuração: {template.nome}
+              </p>
+            )}
           </CardHeader>
           <CardContent className="space-y-6">
-            <div>
-              <h3 className="font-semibold text-lg text-gray-800 mb-2">Função</h3>
-              <p className="text-gray-700 bg-gray-50 p-3 rounded">{osData.funcao}</p>
-            </div>
-
-            <div>
-              <h3 className="font-semibold text-lg text-gray-800 mb-2">Riscos Identificados</h3>
-              <p className="text-gray-700 bg-gray-50 p-3 rounded">{osData.riscos}</p>
-            </div>
-
-            <div>
-              <h3 className="font-semibold text-lg text-gray-800 mb-2">Equipamentos de Proteção Individual (EPIs)</h3>
-              <p className="text-gray-700 bg-gray-50 p-3 rounded">{osData.epis}</p>
-            </div>
-
-            <div>
-              <h3 className="font-semibold text-lg text-gray-800 mb-2">Obrigações do Colaborador</h3>
-              <p className="text-gray-700 bg-gray-50 p-3 rounded">{osData.obrigacoes}</p>
-            </div>
-
-            <div>
-              <h3 className="font-semibold text-lg text-gray-800 mb-2">Proibições</h3>
-              <p className="text-gray-700 bg-gray-50 p-3 rounded">{osData.proibicoes}</p>
-            </div>
-
-            <div>
-              <h3 className="font-semibold text-lg text-gray-800 mb-2">Penalidades</h3>
-              <p className="text-gray-700 bg-gray-50 p-3 rounded">{osData.penalidades}</p>
-            </div>
-
-            <div>
-              <h3 className="font-semibold text-lg text-gray-800 mb-2">Termo de Recebimento e Compromisso</h3>
-              <p className="text-gray-700 bg-gray-50 p-3 rounded">{osData.termoRecebimento}</p>
-            </div>
-
-            <div>
-              <h3 className="font-semibold text-lg text-gray-800 mb-2">Procedimentos em Caso de Acidente</h3>
-              <p className="text-gray-700 bg-gray-50 p-3 rounded">{osData.procedimentosAcidente}</p>
-            </div>
+            {renderDetailField('funcao', osData.funcao)}
+            {renderDetailField('riscos', osData.riscos)}
+            {renderDetailField('epis', osData.epis)}
+            {renderDetailField('obrigacoes', osData.obrigacoes)}
+            {renderDetailField('proibicoes', osData.proibicoes)}
+            {renderDetailField('penalidades', osData.penalidades)}
+            {renderDetailField('termoRecebimento', osData.termoRecebimento)}
+            {renderDetailField('procedimentosAcidente', osData.procedimentosAcidente)}
           </CardContent>
         </Card>
       </div>
