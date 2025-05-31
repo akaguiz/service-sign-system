@@ -40,7 +40,7 @@ export function AppSidebar() {
   const location = useLocation();
 
   return (
-    <Sidebar>
+    <Sidebar collapsible="offcanvas">
       <SidebarHeader className="p-4">
         <div className="flex items-center space-x-2">
           <FileText className="w-6 h-6 text-primary" />
