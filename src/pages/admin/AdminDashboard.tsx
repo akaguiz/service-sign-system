@@ -33,7 +33,7 @@ const AdminDashboard = () => {
             <div className="container mx-auto px-4 py-8">
               <div className="flex justify-center">
                 {/* Seção OS - Centralizada e com tamanho ajustado */}
-                <Card className="hover:shadow-lg transition-shadow w-full max-w-lg">
+                <Card className="transition-shadow w-full max-w-lg">
                   <CardHeader className="text-center pb-4">
                     <div className="w-16 h-16 bg-primary rounded-full flex items-center justify-center mx-auto mb-4">
                       <FileText className="w-8 h-8 text-white" />
