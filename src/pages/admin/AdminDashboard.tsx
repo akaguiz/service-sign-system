@@ -51,13 +51,13 @@ const AdminDashboard = () => {
                       </Button>
                     </Link>
                     <Link to="/admin/os/new">
-                      <Button variant="outline" className="w-full border-primary text-primary hover:bg-primary-light h-12">
+                      <Button variant="outline" className="w-full border-primary text-primary hover:bg-primary-light h-12 mt-4">
                         <Plus className="w-4 h-4 mr-2" />
                         Nova OS
                       </Button>
                     </Link>
                     <Link to="/admin/os/config">
-                      <Button variant="outline" className="w-full border-primary text-primary hover:bg-primary-light h-12">
+                      <Button variant="outline" className="w-full border-primary text-primary hover:bg-primary-light h-12 mt-4">
                         <Settings className="w-4 h-4 mr-2" />
                         Configurar OS
                       </Button>
