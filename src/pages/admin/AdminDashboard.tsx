@@ -40,10 +40,10 @@ const AdminDashboard = () => {
                     </div>
                     <CardTitle className="text-2xl text-gray-800">Ordens de Serviço</CardTitle>
                     <CardDescription>
-                      Gerenciar e visualizar todas as ordens de serviço
+                      Gerencie e visualize todas as ordens de serviço
                     </CardDescription>
                   </CardHeader>
-                  <CardContent className="space-y-4 px-8 pb-8">
+                  {/* <CardContent className="space-y-4 px-8 pb-8">
                     <Link to="/admin/os">
                       <Button className="w-full bg-primary hover:bg-primary-hover text-white h-12">
                         <Search className="w-4 h-4 mr-2" />
@@ -62,7 +62,7 @@ const AdminDashboard = () => {
                         Configurar OS
                       </Button>
                     </Link>
-                  </CardContent>
+                  </CardContent> */}
                 </Card>
               </div>
 
