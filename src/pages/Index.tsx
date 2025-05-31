@@ -64,9 +64,9 @@ const Index = () => {
         </div>
 
         <div className="text-center mt-16">
-          <p className="text-gray-500">
+          {/* <p className="text-gray-500">
             Sistema desenvolvido para automatizar a geração, edição e assinatura de Ordens de Serviço
-          </p>
+          </p> */}
         </div>
       </div>
     </div>
