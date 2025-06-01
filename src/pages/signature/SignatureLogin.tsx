@@ -7,29 +7,46 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { ArrowLeft, FileText } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
+import { useOS } from "@/contexts/OSContext";
 
 const SignatureLogin = () => {
   const [cpf, setCpf] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
+  const { getOSByCPF } = useOS();
 
   const handleAccess = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
 
+    console.log('Tentando buscar OS para CPF:', cpf);
+    
     // Simular busca de OS pelo CPF
     setTimeout(() => {
       if (cpf.length >= 11) {
-        toast({
-          title: "Documento encontrado!",
-          description: "Redirecionando para visualização da OS.",
-        });
-        // Corrigir a rota para /signature/:cpf em vez de /signature/view/:cpf
-        navigate(`/signature/${cpf.replace(/\D/g, '')}`);
+        const cleanCPF = cpf.replace(/\D/g, '');
+        console.log('CPF limpo para busca:', cleanCPF);
+        
+        const foundOS = getOSByCPF(cleanCPF);
+        console.log('Resultado da busca:', foundOS);
+        
+        if (foundOS) {
+          toast({
+            title: "Documento encontrado!",
+            description: "Redirecionando para visualização da OS.",
+          });
+          navigate(`/signature/${cleanCPF}`);
+        } else {
+          toast({
+            title: "CPF não encontrado",
+            description: "Não foi encontrada nenhuma OS vinculada a este CPF.",
+            variant: "destructive",
+          });
+        }
       } else {
         toast({
-          title: "CPF não encontrado",
-          description: "Não foi encontrada nenhuma OS vinculada a este CPF.",
+          title: "CPF inválido",
+          description: "Por favor, digite um CPF válido.",
           variant: "destructive",
         });
       }

@@ -89,7 +89,20 @@ export const OSProvider = ({ children }: { children: ReactNode }) => {
   };
 
   const getOSByCPF = (cpf: string) => {
-    return osList.find(os => os.cpf === cpf);
+    console.log('Buscando OS para CPF:', cpf);
+    console.log('Lista de OSs disponíveis:', osList.map(os => ({ id: os.id, cpf: os.cpf, colaborador: os.colaborador })));
+    
+    // Normalizar CPF removendo formatação
+    const normalizedSearchCPF = cpf.replace(/\D/g, '');
+    
+    const foundOS = osList.find(os => {
+      const normalizedOSCPF = os.cpf.replace(/\D/g, '');
+      console.log(`Comparando: ${normalizedSearchCPF} com ${normalizedOSCPF}`);
+      return normalizedOSCPF === normalizedSearchCPF;
+    });
+
+    console.log('OS encontrada:', foundOS);
+    return foundOS;
   };
 
   const searchOS = (colaborador: string, cpf: string) => {
