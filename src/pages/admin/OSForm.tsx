@@ -1,6 +1,6 @@
 
 import { useState, useEffect } from "react";
-import { useNavigate, useParams } from "react-router-dom";
+import { useNavigate, useParams, useSearchParams } from "react-router-dom";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -17,6 +17,8 @@ import { AppSidebar } from "@/components/AppSidebar";
 const OSForm = () => {
   const navigate = useNavigate();
   const { id } = useParams();
+  const [searchParams] = useSearchParams();
+  const cpfFromUrl = searchParams.get('cpf');
   const { addOS, updateOS, getOSById } = useOS();
   const { templates } = useOSConfig();
   const isEditing = !!id;
@@ -25,7 +27,7 @@ const OSForm = () => {
   const [formData, setFormData] = useState({
     empresa: "",
     colaborador: "",
-    cpf: "",
+    cpf: cpfFromUrl || "",
     funcao: "",
     riscos: "",
     epis: "",
@@ -63,10 +65,17 @@ const OSForm = () => {
     const template = templates.find(t => t.id === templateId);
     if (template) {
       setSelectedTemplate(template);
-      setFormData(prev => ({
-        ...prev,
-        empresa: template.empresa
-      }));
+      // Preencher campos com conteúdo do modelo
+      const newFormData = { ...formData };
+      newFormData.empresa = template.empresa;
+      
+      template.fields.forEach(field => {
+        if (field.content.trim() !== '' && field.id !== 'cpf' && field.id !== 'colaborador' && field.id !== 'funcao') {
+          newFormData[field.id as keyof typeof newFormData] = field.content;
+        }
+      });
+      
+      setFormData(newFormData);
     }
   };
 
@@ -83,18 +92,6 @@ const OSForm = () => {
       .replace(/(-\d{2})\d+?$/, '$1');
     
     handleInputChange("cpf", formatted);
-  };
-
-  const isFieldVisible = (fieldId: string) => {
-    if (!selectedTemplate) return true;
-    const field = selectedTemplate.fields.find(f => f.id === fieldId);
-    return field?.visible !== false;
-  };
-
-  const isFieldRequired = (fieldId: string) => {
-    if (!selectedTemplate) return false;
-    const field = selectedTemplate.fields.find(f => f.id === fieldId);
-    return field?.required === true;
   };
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -125,13 +122,11 @@ const OSForm = () => {
           <div className="min-h-screen bg-gray-50">
             {/* Header */}
             <header className="bg-primary shadow-sm">
-              <div className="container mx-auto px-4 py-4 flex items-center justify-between">
-                <div className="flex items-center">
-                  <SidebarTrigger className="mr-4 text-white hover:bg-white/10" />
-                  <h1 className="text-2xl font-bold text-white">
-                    {isEditing ? "Editar" : "Nova"} Ordem de Serviço
-                  </h1>
-                </div>
+              <div className="container mx-auto px-4 py-4 flex items-center">
+                <SidebarTrigger className="mr-4 text-white hover:bg-white/10" />
+                <h1 className="text-2xl font-bold text-white">
+                  {isEditing ? "Editar" : "Nova"} Ordem de Serviço
+                </h1>
               </div>
             </header>
 
@@ -142,13 +137,13 @@ const OSForm = () => {
                     <CardTitle>Informações da Ordem de Serviço</CardTitle>
                   </CardHeader>
                   <CardContent className="space-y-6">
-                    {/* Seletor de Configuração */}
+                    {/* Seletor de Modelo */}
                     {!isEditing && (
                       <div className="space-y-2">
-                        <Label htmlFor="template">Configuração de OS</Label>
+                        <Label htmlFor="template">Modelo de OS</Label>
                         <Select value={selectedTemplate?.id || ""} onValueChange={handleTemplateSelect}>
                           <SelectTrigger>
-                            <SelectValue placeholder="Selecione uma configuração existente" />
+                            <SelectValue placeholder="Selecione um modelo existente" />
                           </SelectTrigger>
                           <SelectContent>
                             {templates.map((template) => (
@@ -163,185 +158,131 @@ const OSForm = () => {
 
                     {/* Dados básicos */}
                     <div className="grid md:grid-cols-2 gap-4">
-                      {isFieldVisible('empresa') && (
-                        <div className="space-y-2">
-                          <Label htmlFor="empresa">
-                            Empresa {isFieldRequired('empresa') && '*'}
-                          </Label>
-                          <Input
-                            id="empresa"
-                            value={formData.empresa}
-                            onChange={(e) => handleInputChange("empresa", e.target.value)}
-                            required={isFieldRequired('empresa')}
-                          />
-                        </div>
-                      )}
-                      {isFieldVisible('dataEmissao') && (
-                        <div className="space-y-2">
-                          <Label htmlFor="dataEmissao">
-                            Data de Emissão {isFieldRequired('dataEmissao') && '*'}
-                          </Label>
-                          <Input
-                            id="dataEmissao"
-                            type="date"
-                            value={formData.dataEmissao}
-                            onChange={(e) => handleInputChange("dataEmissao", e.target.value)}
-                            required={isFieldRequired('dataEmissao')}
-                          />
-                        </div>
-                      )}
+                      <div className="space-y-2">
+                        <Label htmlFor="empresa">Empresa *</Label>
+                        <Input
+                          id="empresa"
+                          value={formData.empresa}
+                          onChange={(e) => handleInputChange("empresa", e.target.value)}
+                          required
+                        />
+                      </div>
+                      <div className="space-y-2">
+                        <Label htmlFor="dataEmissao">Data de Emissão *</Label>
+                        <Input
+                          id="dataEmissao"
+                          type="date"
+                          value={formData.dataEmissao}
+                          onChange={(e) => handleInputChange("dataEmissao", e.target.value)}
+                          required
+                        />
+                      </div>
                     </div>
 
                     <div className="grid md:grid-cols-3 gap-4">
-                      {isFieldVisible('colaborador') && (
-                        <div className="space-y-2">
-                          <Label htmlFor="colaborador">
-                            Nome do Colaborador {isFieldRequired('colaborador') && '*'}
-                          </Label>
-                          <Input
-                            id="colaborador"
-                            value={formData.colaborador}
-                            onChange={(e) => handleInputChange("colaborador", e.target.value)}
-                            required={isFieldRequired('colaborador')}
-                          />
-                        </div>
-                      )}
-                      {isFieldVisible('cpf') && (
-                        <div className="space-y-2">
-                          <Label htmlFor="cpf">
-                            CPF {isFieldRequired('cpf') && '*'}
-                          </Label>
-                          <Input
-                            id="cpf"
-                            value={formData.cpf}
-                            onChange={(e) => formatCPF(e.target.value)}
-                            placeholder="000.000.000-00"
-                            maxLength={14}
-                            required={isFieldRequired('cpf')}
-                          />
-                        </div>
-                      )}
-                      {isFieldVisible('funcao') && (
-                        <div className="space-y-2">
-                          <Label htmlFor="funcao">
-                            Função {isFieldRequired('funcao') && '*'}
-                          </Label>
-                          <Input
-                            id="funcao"
-                            value={formData.funcao}
-                            onChange={(e) => handleInputChange("funcao", e.target.value)}
-                            required={isFieldRequired('funcao')}
-                          />
-                        </div>
-                      )}
+                      <div className="space-y-2">
+                        <Label htmlFor="colaborador">Nome do Colaborador *</Label>
+                        <Input
+                          id="colaborador"
+                          value={formData.colaborador}
+                          onChange={(e) => handleInputChange("colaborador", e.target.value)}
+                          required
+                        />
+                      </div>
+                      <div className="space-y-2">
+                        <Label htmlFor="cpf">CPF *</Label>
+                        <Input
+                          id="cpf"
+                          value={formData.cpf}
+                          onChange={(e) => formatCPF(e.target.value)}
+                          placeholder="000.000.000-00"
+                          maxLength={14}
+                          required
+                          disabled={!!cpfFromUrl}
+                        />
+                      </div>
+                      <div className="space-y-2">
+                        <Label htmlFor="funcao">Função *</Label>
+                        <Input
+                          id="funcao"
+                          value={formData.funcao}
+                          onChange={(e) => handleInputChange("funcao", e.target.value)}
+                          required
+                        />
+                      </div>
                     </div>
 
                     {/* Campos de texto */}
                     <div className="space-y-4">
-                      {isFieldVisible('riscos') && (
-                        <div className="space-y-2">
-                          <Label htmlFor="riscos">
-                            Riscos {isFieldRequired('riscos') && '*'}
-                          </Label>
-                          <Textarea
-                            id="riscos"
-                            value={formData.riscos}
-                            onChange={(e) => handleInputChange("riscos", e.target.value)}
-                            rows={3}
-                            required={isFieldRequired('riscos')}
-                          />
-                        </div>
-                      )}
+                      <div className="space-y-2">
+                        <Label htmlFor="riscos">Riscos</Label>
+                        <Textarea
+                          id="riscos"
+                          value={formData.riscos}
+                          onChange={(e) => handleInputChange("riscos", e.target.value)}
+                          rows={3}
+                        />
+                      </div>
 
-                      {isFieldVisible('epis') && (
-                        <div className="space-y-2">
-                          <Label htmlFor="epis">
-                            Equipamentos de Proteção (EPIs) {isFieldRequired('epis') && '*'}
-                          </Label>
-                          <Textarea
-                            id="epis"
-                            value={formData.epis}
-                            onChange={(e) => handleInputChange("epis", e.target.value)}
-                            rows={3}
-                            required={isFieldRequired('epis')}
-                          />
-                        </div>
-                      )}
+                      <div className="space-y-2">
+                        <Label htmlFor="epis">Equipamentos de Proteção (EPIs)</Label>
+                        <Textarea
+                          id="epis"
+                          value={formData.epis}
+                          onChange={(e) => handleInputChange("epis", e.target.value)}
+                          rows={3}
+                        />
+                      </div>
 
-                      {isFieldVisible('obrigacoes') && (
-                        <div className="space-y-2">
-                          <Label htmlFor="obrigacoes">
-                            Obrigações do Colaborador {isFieldRequired('obrigacoes') && '*'}
-                          </Label>
-                          <Textarea
-                            id="obrigacoes"
-                            value={formData.obrigacoes}
-                            onChange={(e) => handleInputChange("obrigacoes", e.target.value)}
-                            rows={4}
-                            required={isFieldRequired('obrigacoes')}
-                          />
-                        </div>
-                      )}
+                      <div className="space-y-2">
+                        <Label htmlFor="obrigacoes">Obrigações do Colaborador</Label>
+                        <Textarea
+                          id="obrigacoes"
+                          value={formData.obrigacoes}
+                          onChange={(e) => handleInputChange("obrigacoes", e.target.value)}
+                          rows={4}
+                        />
+                      </div>
 
-                      {isFieldVisible('proibicoes') && (
-                        <div className="space-y-2">
-                          <Label htmlFor="proibicoes">
-                            Proibições {isFieldRequired('proibicoes') && '*'}
-                          </Label>
-                          <Textarea
-                            id="proibicoes"
-                            value={formData.proibicoes}
-                            onChange={(e) => handleInputChange("proibicoes", e.target.value)}
-                            rows={4}
-                            required={isFieldRequired('proibicoes')}
-                          />
-                        </div>
-                      )}
+                      <div className="space-y-2">
+                        <Label htmlFor="proibicoes">Proibições</Label>
+                        <Textarea
+                          id="proibicoes"
+                          value={formData.proibicoes}
+                          onChange={(e) => handleInputChange("proibicoes", e.target.value)}
+                          rows={4}
+                        />
+                      </div>
 
-                      {isFieldVisible('penalidades') && (
-                        <div className="space-y-2">
-                          <Label htmlFor="penalidades">
-                            Penalidades {isFieldRequired('penalidades') && '*'}
-                          </Label>
-                          <Textarea
-                            id="penalidades"
-                            value={formData.penalidades}
-                            onChange={(e) => handleInputChange("penalidades", e.target.value)}
-                            rows={3}
-                            required={isFieldRequired('penalidades')}
-                          />
-                        </div>
-                      )}
+                      <div className="space-y-2">
+                        <Label htmlFor="penalidades">Penalidades</Label>
+                        <Textarea
+                          id="penalidades"
+                          value={formData.penalidades}
+                          onChange={(e) => handleInputChange("penalidades", e.target.value)}
+                          rows={3}
+                        />
+                      </div>
 
-                      {isFieldVisible('termoRecebimento') && (
-                        <div className="space-y-2">
-                          <Label htmlFor="termoRecebimento">
-                            Termo de Recebimento e Compromisso {isFieldRequired('termoRecebimento') && '*'}
-                          </Label>
-                          <Textarea
-                            id="termoRecebimento"
-                            value={formData.termoRecebimento}
-                            onChange={(e) => handleInputChange("termoRecebimento", e.target.value)}
-                            rows={4}
-                            required={isFieldRequired('termoRecebimento')}
-                          />
-                        </div>
-                      )}
+                      <div className="space-y-2">
+                        <Label htmlFor="termoRecebimento">Termo de Recebimento e Compromisso</Label>
+                        <Textarea
+                          id="termoRecebimento"
+                          value={formData.termoRecebimento}
+                          onChange={(e) => handleInputChange("termoRecebimento", e.target.value)}
+                          rows={4}
+                        />
+                      </div>
 
-                      {isFieldVisible('procedimentosAcidente') && (
-                        <div className="space-y-2">
-                          <Label htmlFor="procedimentosAcidente">
-                            Procedimentos em Caso de Acidente {isFieldRequired('procedimentosAcidente') && '*'}
-                          </Label>
-                          <Textarea
-                            id="procedimentosAcidente"
-                            value={formData.procedimentosAcidente}
-                            onChange={(e) => handleInputChange("procedimentosAcidente", e.target.value)}
-                            rows={4}
-                            required={isFieldRequired('procedimentosAcidente')}
-                          />
-                        </div>
-                      )}
+                      <div className="space-y-2">
+                        <Label htmlFor="procedimentosAcidente">Procedimentos em Caso de Acidente</Label>
+                        <Textarea
+                          id="procedimentosAcidente"
+                          value={formData.procedimentosAcidente}
+                          onChange={(e) => handleInputChange("procedimentosAcidente", e.target.value)}
+                          rows={4}
+                        />
+                      </div>
                     </div>
 
                     <div className="flex justify-end space-x-4 pt-6">

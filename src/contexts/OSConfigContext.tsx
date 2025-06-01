@@ -4,8 +4,7 @@ import React, { createContext, useContext, useState, ReactNode } from 'react';
 export interface OSField {
   id: string;
   label: string;
-  required: boolean;
-  visible: boolean;
+  content: string;
 }
 
 export interface OSTemplate {
@@ -25,18 +24,18 @@ interface OSConfigContextType {
 }
 
 const defaultFields: OSField[] = [
-  { id: 'colaborador', label: 'Nome do Colaborador', required: true, visible: true },
-  { id: 'cpf', label: 'CPF', required: true, visible: true },
-  { id: 'empresa', label: 'Empresa', required: true, visible: true },
-  { id: 'funcao', label: 'Função', required: true, visible: true },
-  { id: 'dataEmissao', label: 'Data de Emissão', required: true, visible: true },
-  { id: 'riscos', label: 'Riscos Identificados', required: false, visible: true },
-  { id: 'epis', label: 'Equipamentos de Proteção (EPIs)', required: false, visible: true },
-  { id: 'obrigacoes', label: 'Obrigações do Colaborador', required: false, visible: true },
-  { id: 'proibicoes', label: 'Proibições', required: false, visible: true },
-  { id: 'penalidades', label: 'Penalidades', required: false, visible: true },
-  { id: 'termoRecebimento', label: 'Termo de Recebimento', required: false, visible: true },
-  { id: 'procedimentosAcidente', label: 'Procedimentos em Caso de Acidente', required: false, visible: true },
+  { id: 'colaborador', label: 'Nome do Colaborador', content: '' },
+  { id: 'cpf', label: 'CPF', content: '' },
+  { id: 'empresa', label: 'Empresa', content: '' },
+  { id: 'funcao', label: 'Função', content: '' },
+  { id: 'dataEmissao', label: 'Data de Emissão', content: '' },
+  { id: 'riscos', label: 'Riscos Identificados', content: '' },
+  { id: 'epis', label: 'Equipamentos de Proteção (EPIs)', content: '' },
+  { id: 'obrigacoes', label: 'Obrigações do Colaborador', content: '' },
+  { id: 'proibicoes', label: 'Proibições', content: '' },
+  { id: 'penalidades', label: 'Penalidades', content: '' },
+  { id: 'termoRecebimento', label: 'Termo de Recebimento', content: '' },
+  { id: 'procedimentosAcidente', label: 'Procedimentos em Caso de Acidente', content: '' },
 ];
 
 const OSConfigContext = createContext<OSConfigContextType | undefined>(undefined);

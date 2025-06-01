@@ -90,12 +90,15 @@ const SignatureCanvas: React.FC<SignatureCanvasProps> = ({
           ref={canvasRef}
           width={width}
           height={height}
-          className="border border-gray-200 rounded cursor-crosshair w-full"
+          className="border border-gray-200 rounded w-full"
+          style={{ 
+            touchAction: 'none',
+            cursor: 'crosshair'
+          }}
           onMouseDown={startDrawing}
           onMouseMove={draw}
           onMouseUp={stopDrawing}
           onMouseLeave={stopDrawing}
-          style={{ touchAction: 'none' }}
         />
       </div>
       <div className="flex justify-between items-center">

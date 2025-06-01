@@ -1,11 +1,11 @@
+
 import { useState } from "react";
-import { Link } from "react-router-dom";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Checkbox } from "@/components/ui/checkbox";
-import { ArrowLeft, Settings, Plus, Edit, Trash2 } from "lucide-react";
+import { Textarea } from "@/components/ui/textarea";
+import { Settings, Plus, Edit, Trash2 } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
 import { useOSConfig, OSField } from "@/contexts/OSConfigContext";
 import { SidebarProvider, SidebarTrigger, SidebarInset } from "@/components/ui/sidebar";
@@ -22,18 +22,18 @@ const OSConfig = () => {
   });
 
   const defaultFields: OSField[] = [
-    { id: 'colaborador', label: 'Nome do Colaborador', required: true, visible: true },
-    { id: 'cpf', label: 'CPF', required: true, visible: true },
-    { id: 'empresa', label: 'Empresa', required: true, visible: true },
-    { id: 'funcao', label: 'Função', required: true, visible: true },
-    { id: 'dataEmissao', label: 'Data de Emissão', required: true, visible: true },
-    { id: 'riscos', label: 'Riscos Identificados', required: false, visible: true },
-    { id: 'epis', label: 'Equipamentos de Proteção (EPIs)', required: false, visible: true },
-    { id: 'obrigacoes', label: 'Obrigações do Colaborador', required: false, visible: true },
-    { id: 'proibicoes', label: 'Proibições', required: false, visible: true },
-    { id: 'penalidades', label: 'Penalidades', required: false, visible: true },
-    { id: 'termoRecebimento', label: 'Termo de Recebimento', required: false, visible: true },
-    { id: 'procedimentosAcidente', label: 'Procedimentos em Caso de Acidente', required: false, visible: true },
+    { id: 'colaborador', label: 'Nome do Colaborador', content: '' },
+    { id: 'cpf', label: 'CPF', content: '' },
+    { id: 'empresa', label: 'Empresa', content: '' },
+    { id: 'funcao', label: 'Função', content: '' },
+    { id: 'dataEmissao', label: 'Data de Emissão', content: '' },
+    { id: 'riscos', label: 'Riscos Identificados', content: '' },
+    { id: 'epis', label: 'Equipamentos de Proteção (EPIs)', content: '' },
+    { id: 'obrigacoes', label: 'Obrigações do Colaborador', content: '' },
+    { id: 'proibicoes', label: 'Proibições', content: '' },
+    { id: 'penalidades', label: 'Penalidades', content: '' },
+    { id: 'termoRecebimento', label: 'Termo de Recebimento', content: '' },
+    { id: 'procedimentosAcidente', label: 'Procedimentos em Caso de Acidente', content: '' },
   ];
 
   const startCreating = () => {
@@ -59,11 +59,11 @@ const OSConfig = () => {
     }
   };
 
-  const handleFieldChange = (fieldId: string, property: 'visible' | 'required', value: boolean) => {
+  const handleFieldContentChange = (fieldId: string, content: string) => {
     setFormData(prev => ({
       ...prev,
       fields: prev.fields.map(field =>
-        field.id === fieldId ? { ...field, [property]: value } : field
+        field.id === fieldId ? { ...field, content } : field
       )
     }));
   };
@@ -82,13 +82,13 @@ const OSConfig = () => {
       updateTemplate(editingTemplate, formData);
       toast({
         title: "Sucesso",
-        description: "Configuração atualizada com sucesso!"
+        description: "Modelo atualizado com sucesso!"
       });
     } else {
       addTemplate(formData);
       toast({
         title: "Sucesso",
-        description: "Nova configuração criada com sucesso!"
+        description: "Novo modelo criado com sucesso!"
       });
     }
 
@@ -100,7 +100,7 @@ const OSConfig = () => {
     deleteTemplate(templateId);
     toast({
       title: "Sucesso",
-      description: "Configuração removida com sucesso!"
+      description: "Modelo removido com sucesso!"
     });
   };
 
@@ -120,7 +120,7 @@ const OSConfig = () => {
               <div className="container mx-auto px-4 py-4 flex items-center justify-between">
                 <div className="flex items-center">
                   <SidebarTrigger className="mr-4 text-white hover:bg-white/10" />
-                  <h1 className="text-2xl font-bold text-white">Configuração de Ordens de Serviço</h1>
+                  <h1 className="text-2xl font-bold text-white">Modelos de Ordens de Serviço</h1>
                 </div>
                 {!isCreating && !editingTemplate && (
                   <Button 
@@ -130,7 +130,7 @@ const OSConfig = () => {
                     onClick={startCreating}
                   >
                     <Plus className="w-4 h-4 mr-2" />
-                    Nova Configuração
+                    Novo Modelo
                   </Button>
                 )}
               </div>
@@ -142,7 +142,7 @@ const OSConfig = () => {
                   <CardHeader>
                     <CardTitle className="flex items-center">
                       <Settings className="w-5 h-5 mr-2 text-primary" />
-                      {editingTemplate ? "Editar" : "Nova"} Configuração de OS
+                      {editingTemplate ? "Editar" : "Novo"} Modelo de OS
                     </CardTitle>
                   </CardHeader>
                   <CardContent className="space-y-6">
@@ -157,45 +157,32 @@ const OSConfig = () => {
                         />
                       </div>
                       <div className="space-y-2">
-                        <Label htmlFor="nome">Nome da Configuração *</Label>
+                        <Label htmlFor="nome">Nome do Modelo *</Label>
                         <Input
                           id="nome"
                           value={formData.nome}
                           onChange={(e) => setFormData(prev => ({ ...prev, nome: e.target.value }))}
-                          placeholder="Nome para identificar esta configuração"
+                          placeholder="Nome para identificar este modelo"
                         />
                       </div>
                     </div>
 
                     <div>
-                      <h3 className="text-lg font-semibold mb-4">Campos da Ordem de Serviço</h3>
-                      <div className="space-y-3">
+                      <h3 className="text-lg font-semibold mb-4">Configurações dos Campos</h3>
+                      <div className="space-y-4">
                         {formData.fields.map((field) => (
-                          <div key={field.id} className="flex items-center justify-between p-3 border rounded-lg">
-                            <span className="font-medium">{field.label}</span>
-                            <div className="flex items-center space-x-4">
-                              <div className="flex items-center space-x-2">
-                                <Checkbox
-                                  id={`visible-${field.id}`}
-                                  checked={field.visible}
-                                  onCheckedChange={(checked) => 
-                                    handleFieldChange(field.id, 'visible', checked as boolean)
-                                  }
-                                />
-                                <Label htmlFor={`visible-${field.id}`}>Visível</Label>
-                              </div>
-                              <div className="flex items-center space-x-2">
-                                <Checkbox
-                                  id={`required-${field.id}`}
-                                  checked={field.required}
-                                  onCheckedChange={(checked) => 
-                                    handleFieldChange(field.id, 'required', checked as boolean)
-                                  }
-                                  disabled={field.id === 'colaborador' || field.id === 'cpf' || field.id === 'empresa'}
-                                />
-                                <Label htmlFor={`required-${field.id}`}>Obrigatório</Label>
-                              </div>
-                            </div>
+                          <div key={field.id} className="space-y-2">
+                            <Label htmlFor={`content-${field.id}`} className="font-medium">
+                              {field.label}
+                            </Label>
+                            <Textarea
+                              id={`content-${field.id}`}
+                              value={field.content}
+                              onChange={(e) => handleFieldContentChange(field.id, e.target.value)}
+                              placeholder={`Configurações para ${field.label}`}
+                              rows={3}
+                              className="w-full"
+                            />
                           </div>
                         ))}
                       </div>
@@ -206,7 +193,7 @@ const OSConfig = () => {
                         Cancelar
                       </Button>
                       <Button onClick={handleSave} className="bg-primary hover:bg-primary-hover">
-                        {editingTemplate ? "Atualizar" : "Salvar"} Configuração
+                        {editingTemplate ? "Atualizar" : "Salvar"} Modelo
                       </Button>
                     </div>
                   </CardContent>
@@ -216,13 +203,13 @@ const OSConfig = () => {
                   <CardHeader>
                     <CardTitle className="flex items-center">
                       <Settings className="w-5 h-5 mr-2 text-primary" />
-                      Configurações Existentes ({templates.length})
+                      Modelos Existentes ({templates.length})
                     </CardTitle>
                   </CardHeader>
                   <CardContent>
                     {templates.length === 0 ? (
                       <div className="text-center py-8 text-gray-500">
-                        Nenhuma configuração encontrada. Clique em "Nova Configuração" para criar uma.
+                        Nenhum modelo encontrado. Clique em "Novo Modelo" para criar um.
                       </div>
                     ) : (
                       <div className="space-y-4">
@@ -232,7 +219,7 @@ const OSConfig = () => {
                               <h3 className="font-semibold">{template.nome}</h3>
                               <p className="text-gray-600">{template.empresa}</p>
                               <p className="text-sm text-gray-500">
-                                {template.fields.filter(f => f.visible).length} campos visíveis
+                                {template.fields.filter(f => f.content.trim() !== '').length} campos configurados
                               </p>
                             </div>
                             <div className="flex space-x-2">

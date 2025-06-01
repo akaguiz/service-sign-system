@@ -1,5 +1,6 @@
 
-import { Link, useLocation } from "react-router-dom";
+import { Home, Search, Plus, Settings, LogOut } from "lucide-react";
+import { Link, useNavigate } from "react-router-dom";
 import {
   Sidebar,
   SidebarContent,
@@ -9,9 +10,7 @@ import {
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
-  SidebarHeader,
 } from "@/components/ui/sidebar";
-import { FileText, Search, Plus, Settings, Home, LogOut } from "lucide-react";
 
 const menuItems = [
   {
@@ -26,57 +25,44 @@ const menuItems = [
   },
   {
     title: "Nova OS",
-    url: "/admin/os/new",
+    url: "/admin/cpf-search",
     icon: Plus,
   },
   {
-    title: "Configurar OS",
+    title: "Modelos",
     url: "/admin/os/config",
     icon: Settings,
   },
 ];
 
 export function AppSidebar() {
-  const location = useLocation();
+  const navigate = useNavigate();
+
+  const handleLogout = () => {
+    navigate("/admin/login");
+  };
 
   return (
-    <Sidebar collapsible="offcanvas">
-      <SidebarHeader className="p-4">
-        <div className="flex items-center space-x-2">
-          <FileText className="w-6 h-6 text-primary" />
-          <span className="font-bold text-lg">Admin OS</span>
-        </div>
-      </SidebarHeader>
+    <Sidebar collapsible="icon">
       <SidebarContent>
         <SidebarGroup>
-          <SidebarGroupLabel>Ordens de Serviço</SidebarGroupLabel>
+          <SidebarGroupLabel>Menu</SidebarGroupLabel>
           <SidebarGroupContent>
             <SidebarMenu>
               {menuItems.map((item) => (
                 <SidebarMenuItem key={item.title}>
-                  <SidebarMenuButton 
-                    asChild
-                    isActive={location.pathname === item.url}
-                  >
+                  <SidebarMenuButton asChild>
                     <Link to={item.url}>
-                      <item.icon className="w-4 h-4" />
+                      <item.icon />
                       <span>{item.title}</span>
                     </Link>
                   </SidebarMenuButton>
                 </SidebarMenuItem>
               ))}
-            </SidebarMenu>
-          </SidebarGroupContent>
-        </SidebarGroup>
-        <SidebarGroup>
-          <SidebarGroupContent>
-            <SidebarMenu>
               <SidebarMenuItem>
-                <SidebarMenuButton asChild>
-                  <Link to="/">
-                    <LogOut className="w-4 h-4" />
-                    <span>Sair</span>
-                  </Link>
+                <SidebarMenuButton onClick={handleLogout}>
+                  <LogOut />
+                  <span>Sair</span>
                 </SidebarMenuButton>
               </SidebarMenuItem>
             </SidebarMenu>
