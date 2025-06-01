@@ -118,8 +118,8 @@ const OSForm = () => {
     <SidebarProvider>
       <div className="min-h-screen flex w-full">
         <AppSidebar />
-        <SidebarInset>
-          <div className="min-h-screen bg-gray-50">
+        <SidebarInset className="flex-1">
+          <div className="min-h-screen bg-gray-50 w-full">
             {/* Header */}
             <header className="bg-primary shadow-sm">
               <div className="container mx-auto px-4 py-4 flex items-center">
@@ -164,6 +164,7 @@ const OSForm = () => {
                           id="empresa"
                           value={formData.empresa}
                           onChange={(e) => handleInputChange("empresa", e.target.value)}
+                          placeholder="Nome da empresa"
                           required
                         />
                       </div>
@@ -186,6 +187,7 @@ const OSForm = () => {
                           id="colaborador"
                           value={formData.colaborador}
                           onChange={(e) => handleInputChange("colaborador", e.target.value)}
+                          placeholder="Nome completo do colaborador"
                           required
                         />
                       </div>
@@ -207,6 +209,7 @@ const OSForm = () => {
                           id="funcao"
                           value={formData.funcao}
                           onChange={(e) => handleInputChange("funcao", e.target.value)}
+                          placeholder="Função do colaborador"
                           required
                         />
                       </div>
@@ -220,6 +223,7 @@ const OSForm = () => {
                           id="riscos"
                           value={formData.riscos}
                           onChange={(e) => handleInputChange("riscos", e.target.value)}
+                          placeholder="Descrição dos riscos identificados"
                           rows={3}
                         />
                       </div>
@@ -230,6 +234,7 @@ const OSForm = () => {
                           id="epis"
                           value={formData.epis}
                           onChange={(e) => handleInputChange("epis", e.target.value)}
+                          placeholder="Lista dos EPIs necessários"
                           rows={3}
                         />
                       </div>
@@ -240,6 +245,7 @@ const OSForm = () => {
                           id="obrigacoes"
                           value={formData.obrigacoes}
                           onChange={(e) => handleInputChange("obrigacoes", e.target.value)}
+                          placeholder="Descrição das obrigações do colaborador"
                           rows={4}
                         />
                       </div>
@@ -250,6 +256,7 @@ const OSForm = () => {
                           id="proibicoes"
                           value={formData.proibicoes}
                           onChange={(e) => handleInputChange("proibicoes", e.target.value)}
+                          placeholder="Lista das proibições"
                           rows={4}
                         />
                       </div>
@@ -260,6 +267,7 @@ const OSForm = () => {
                           id="penalidades"
                           value={formData.penalidades}
                           onChange={(e) => handleInputChange("penalidades", e.target.value)}
+                          placeholder="Descrição das penalidades aplicáveis"
                           rows={3}
                         />
                       </div>
@@ -270,6 +278,7 @@ const OSForm = () => {
                           id="termoRecebimento"
                           value={formData.termoRecebimento}
                           onChange={(e) => handleInputChange("termoRecebimento", e.target.value)}
+                          placeholder="Texto do termo de recebimento"
                           rows={4}
                         />
                       </div>
@@ -280,6 +289,7 @@ const OSForm = () => {
                           id="procedimentosAcidente"
                           value={formData.procedimentosAcidente}
                           onChange={(e) => handleInputChange("procedimentosAcidente", e.target.value)}
+                          placeholder="Procedimentos a serem seguidos em caso de acidente"
                           rows={4}
                         />
                       </div>

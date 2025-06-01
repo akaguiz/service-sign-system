@@ -65,8 +65,8 @@ const CPFSearch = () => {
     <SidebarProvider>
       <div className="min-h-screen flex w-full">
         <AppSidebar />
-        <SidebarInset>
-          <div className="min-h-screen bg-gray-50">
+        <SidebarInset className="flex-1">
+          <div className="min-h-screen bg-gray-50 w-full">
             {/* Header */}
             <header className="bg-primary shadow-sm">
               <div className="container mx-auto px-4 py-4 flex items-center">

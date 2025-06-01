@@ -17,7 +17,7 @@ const OSView = () => {
 
   if (!osData) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center w-full">
         <Card className="max-w-md">
           <CardContent className="p-6 text-center">
             <h2 className="text-2xl font-bold text-gray-800 mb-2">OS não encontrada</h2>
@@ -40,7 +40,7 @@ const OSView = () => {
 
   const isFieldVisible = (fieldId: string) => {
     if (!template) return true; // Se não há template, mostra todos os campos
-    const field = template.fields.find(f => f.id === fieldId);
+    const field = template?.fields.find(f => f.id === fieldId);
     // Se o campo tem conteúdo configurado no template, ele é visível
     return field?.content && field.content.trim() !== '';
   };
@@ -71,7 +71,7 @@ const OSView = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gray-50 w-full">
       {/* Header */}
       <header className="bg-primary shadow-sm">
         <div className="container mx-auto px-4 py-4 flex items-center">
