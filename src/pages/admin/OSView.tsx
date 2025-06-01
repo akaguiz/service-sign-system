@@ -41,7 +41,8 @@ const OSView = () => {
   const isFieldVisible = (fieldId: string) => {
     if (!template) return true; // Se não há template, mostra todos os campos
     const field = template.fields.find(f => f.id === fieldId);
-    return field?.visible !== false;
+    // Se o campo tem conteúdo configurado no template, ele é visível
+    return field?.content && field.content.trim() !== '';
   };
 
   const renderField = (fieldId: string, value: any, icon?: React.ReactNode) => {
