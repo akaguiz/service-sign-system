@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -22,11 +21,6 @@ const OSConfig = () => {
   });
 
   const defaultFields: OSField[] = [
-    { id: 'colaborador', label: 'Nome do Colaborador', content: '' },
-    { id: 'cpf', label: 'CPF', content: '' },
-    { id: 'empresa', label: 'Empresa', content: '' },
-    { id: 'funcao', label: 'Função', content: '' },
-    { id: 'dataEmissao', label: 'Data de Emissão', content: '' },
     { id: 'riscos', label: 'Riscos Identificados', content: '' },
     { id: 'epis', label: 'Equipamentos de Proteção (EPIs)', content: '' },
     { id: 'obrigacoes', label: 'Obrigações do Colaborador', content: '' },

@@ -24,7 +24,8 @@ const SignatureLogin = () => {
           title: "Documento encontrado!",
           description: "Redirecionando para visualização da OS.",
         });
-        navigate(`/signature/view/${cpf}`);
+        // Corrigir a rota para /signature/:cpf em vez de /signature/view/:cpf
+        navigate(`/signature/${cpf.replace(/\D/g, '')}`);
       } else {
         toast({
           title: "CPF não encontrado",
