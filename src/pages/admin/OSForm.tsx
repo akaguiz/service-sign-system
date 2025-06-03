@@ -21,13 +21,12 @@ const OSForm = () => {
   const { id } = useParams();
   const [searchParams] = useSearchParams();
   const cpfFromUrl = searchParams.get('cpf');
-  const { addOS, updateOS, getOSById } = useOS();
+  const { addOS, updateOS, getOSById, getCollaboratorByCPF } = useOS();
   const { templates } = useOSConfig();
   const isEditing = !!id;
 
   const [selectedTemplate, setSelectedTemplate] = useState<OSTemplate | null>(null);
   const [formData, setFormData] = useState({
-    empresa: "",
     filial: "",
     colaborador: "",
     cpf: cpfFromUrl || "",
@@ -42,12 +41,25 @@ const OSForm = () => {
     dataEmissao: new Date().toISOString().split('T')[0]
   });
 
+  // Preencher dados do colaborador quando CPF for fornecido
+  useEffect(() => {
+    if (cpfFromUrl && !isEditing) {
+      const colaborador = getCollaboratorByCPF(cpfFromUrl);
+      if (colaborador) {
+        setFormData(prev => ({
+          ...prev,
+          colaborador: colaborador.nome,
+          funcao: colaborador.funcao
+        }));
+      }
+    }
+  }, [cpfFromUrl, isEditing, getCollaboratorByCPF]);
+
   useEffect(() => {
     if (isEditing && id) {
       const os = getOSById(id);
       if (os) {
         setFormData({
-          empresa: os.empresa,
           filial: os.filial || "",
           colaborador: os.colaborador,
           cpf: os.cpf,
@@ -71,7 +83,6 @@ const OSForm = () => {
       setSelectedTemplate(template);
       // Preencher campos com conteúdo do modelo
       const newFormData = { ...formData };
-      newFormData.empresa = template.empresa;
       
       template.fields.forEach(field => {
         if (field.content.trim() !== '' && field.id !== 'cpf' && field.id !== 'colaborador' && field.id !== 'funcao') {
@@ -152,7 +163,7 @@ const OSForm = () => {
                           <SelectContent>
                             {templates.map((template) => (
                               <SelectItem key={template.id} value={template.id}>
-                                {template.nome} - {template.empresa}
+                                {template.nome}
                               </SelectItem>
                             ))}
                           </SelectContent>
@@ -161,17 +172,7 @@ const OSForm = () => {
                     )}
 
                     {/* Dados básicos */}
-                    <div className="grid md:grid-cols-3 gap-4">
-                      <div className="space-y-2">
-                        <Label htmlFor="empresa">Empresa *</Label>
-                        <Input
-                          id="empresa"
-                          value={formData.empresa}
-                          onChange={(e) => handleInputChange("empresa", e.target.value)}
-                          placeholder="Nome da empresa"
-                          required
-                        />
-                      </div>
+                    <div className="grid md:grid-cols-2 gap-4">
                       <div className="space-y-2">
                         <Label htmlFor="filial">Filial *</Label>
                         <Select value={formData.filial} onValueChange={(value) => handleInputChange("filial", value)}>
@@ -208,6 +209,7 @@ const OSForm = () => {
                           onChange={(e) => handleInputChange("colaborador", e.target.value)}
                           placeholder="Nome completo do colaborador"
                           required
+                          disabled={!!cpfFromUrl && !isEditing}
                         />
                       </div>
                       <div className="space-y-2">
@@ -230,6 +232,7 @@ const OSForm = () => {
                           onChange={(e) => handleInputChange("funcao", e.target.value)}
                           placeholder="Função do colaborador"
                           required
+                          disabled={!!cpfFromUrl && !isEditing}
                         />
                       </div>
                     </div>

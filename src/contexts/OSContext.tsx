@@ -3,7 +3,7 @@ import React, { createContext, useContext, useState, ReactNode } from 'react';
 
 export interface OS {
   id: string;
-  empresa: string;
+  numero: string; // Adicionar numeração de 4 dígitos
   filial: string;
   colaborador: string;
   cpf: string;
@@ -23,20 +23,27 @@ export interface OS {
 
 interface OSContextType {
   osList: OS[];
-  addOS: (os: Omit<OS, 'id' | 'status'>) => void;
+  addOS: (os: Omit<OS, 'id' | 'status' | 'numero'>) => void;
   updateOS: (id: string, os: Partial<OS>) => void;
   getOSById: (id: string) => OS | undefined;
   getOSByCPF: (cpf: string) => OS | undefined;
   searchOS: (colaborador: string, cpf: string) => OS[];
+  getCollaboratorByCPF: (cpf: string) => { nome: string; funcao: string } | undefined;
 }
 
 const OSContext = createContext<OSContextType | undefined>(undefined);
+
+// Simulando uma base de colaboradores
+const colaboradores = [
+  { cpf: '123.456.789-00', nome: 'João Silva', funcao: 'Técnico de Segurança' },
+  { cpf: '987.654.321-00', nome: 'Maria Santos', funcao: 'Operadora de Máquinas' },
+];
 
 export const OSProvider = ({ children }: { children: ReactNode }) => {
   const [osList, setOSList] = useState<OS[]>([
     {
       id: '1',
-      empresa: 'Empresa A Ltda',
+      numero: '0001',
       filial: 'Rio Centro',
       colaborador: 'João Silva',
       cpf: '123.456.789-00',
@@ -53,7 +60,7 @@ export const OSProvider = ({ children }: { children: ReactNode }) => {
     },
     {
       id: '2',
-      empresa: 'Empresa B Ltda',
+      numero: '0002',
       filial: 'Barra da Tijuca',
       colaborador: 'Maria Santos',
       cpf: '987.654.321-00',
@@ -72,10 +79,19 @@ export const OSProvider = ({ children }: { children: ReactNode }) => {
     }
   ]);
 
-  const addOS = (osData: Omit<OS, 'id' | 'status'>) => {
+  const generateOSNumber = () => {
+    const maxNumber = osList.reduce((max, os) => {
+      const num = parseInt(os.numero);
+      return num > max ? num : max;
+    }, 0);
+    return (maxNumber + 1).toString().padStart(4, '0');
+  };
+
+  const addOS = (osData: Omit<OS, 'id' | 'status' | 'numero'>) => {
     const newOS: OS = {
       ...osData,
       id: Date.now().toString(),
+      numero: generateOSNumber(),
       status: 'pendente'
     };
     setOSList(prev => [...prev, newOS]);
@@ -108,6 +124,11 @@ export const OSProvider = ({ children }: { children: ReactNode }) => {
     return foundOS;
   };
 
+  const getCollaboratorByCPF = (cpf: string) => {
+    const normalizedSearchCPF = cpf.replace(/\D/g, '');
+    return colaboradores.find(col => col.cpf.replace(/\D/g, '') === normalizedSearchCPF);
+  };
+
   const searchOS = (colaborador: string, cpf: string) => {
     return osList.filter(os => 
       os.colaborador.toLowerCase().includes(colaborador.toLowerCase()) &&
@@ -122,7 +143,8 @@ export const OSProvider = ({ children }: { children: ReactNode }) => {
       updateOS,
       getOSById,
       getOSByCPF,
-      searchOS
+      searchOS,
+      getCollaboratorByCPF
     }}>
       {children}
     </OSContext.Provider>

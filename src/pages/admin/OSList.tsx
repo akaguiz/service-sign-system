@@ -114,6 +114,7 @@ const OSList = () => {
                     <table className="w-full">
                       <thead>
                         <tr className="border-b">
+                          <th className="text-left py-3 px-4 font-semibold">Nº OS</th>
                           <th className="text-left py-3 px-4 font-semibold">Colaborador</th>
                           <th className="text-left py-3 px-4 font-semibold">Função</th>
                           <th className="text-left py-3 px-4 font-semibold">CPF</th>
@@ -125,6 +126,7 @@ const OSList = () => {
                       <tbody>
                         {filteredOS.map((os) => (
                           <tr key={os.id} className="border-b hover:bg-gray-50">
+                            <td className="py-3 px-4 font-mono">{os.numero}</td>
                             <td className="py-3 px-4">{os.colaborador}</td>
                             <td className="py-3 px-4">{os.funcao}</td>
                             <td className="py-3 px-4">{os.cpf}</td>
