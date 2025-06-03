@@ -33,10 +33,18 @@ interface OSContextType {
 
 const OSContext = createContext<OSContextType | undefined>(undefined);
 
-// Simulando uma base de colaboradores
+// Base expandida de colaboradores
 const colaboradores = [
   { cpf: '123.456.789-00', nome: 'João Silva', funcao: 'Técnico de Segurança' },
   { cpf: '987.654.321-00', nome: 'Maria Santos', funcao: 'Operadora de Máquinas' },
+  { cpf: '111.222.333-44', nome: 'Pedro Oliveira', funcao: 'Soldador' },
+  { cpf: '555.666.777-88', nome: 'Ana Costa', funcao: 'Técnica em Eletrônica' },
+  { cpf: '999.888.777-66', nome: 'Carlos Mendes', funcao: 'Operador de Empilhadeira' },
+  { cpf: '222.333.444-55', nome: 'Lucia Ferreira', funcao: 'Auxiliar de Produção' },
+  { cpf: '444.555.666-77', nome: 'Roberto Alves', funcao: 'Mecânico Industrial' },
+  { cpf: '666.777.888-99', nome: 'Fernanda Lima', funcao: 'Técnica de Qualidade' },
+  { cpf: '333.444.555-66', nome: 'José Rodrigues', funcao: 'Eletricista' },
+  { cpf: '777.888.999-00', nome: 'Patricia Sousa', funcao: 'Supervisora de Produção' }
 ];
 
 export const OSProvider = ({ children }: { children: ReactNode }) => {
@@ -125,8 +133,14 @@ export const OSProvider = ({ children }: { children: ReactNode }) => {
   };
 
   const getCollaboratorByCPF = (cpf: string) => {
+    console.log('Buscando colaborador para CPF:', cpf);
+    console.log('Lista de colaboradores disponíveis:', colaboradores.map(col => ({ cpf: col.cpf, nome: col.nome, funcao: col.funcao })));
+    
     const normalizedSearchCPF = cpf.replace(/\D/g, '');
-    return colaboradores.find(col => col.cpf.replace(/\D/g, '') === normalizedSearchCPF);
+    const foundCollaborator = colaboradores.find(col => col.cpf.replace(/\D/g, '') === normalizedSearchCPF);
+    
+    console.log('Colaborador encontrado:', foundCollaborator);
+    return foundCollaborator;
   };
 
   const searchOS = (colaborador: string, cpf: string) => {
