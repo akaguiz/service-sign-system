@@ -18,13 +18,13 @@ const filiais = ["Rio Centro", "Barra da Tijuca", "Ipanema"];
 const OSList = () => {
   const [searchName, setSearchName] = useState("");
   const [searchCpf, setSearchCpf] = useState("");
-  const [searchFilial, setSearchFilial] = useState("");
+  const [searchFilial, setSearchFilial] = useState("all");
   const { osList } = useOS();
 
   const filteredOS = osList.filter(os => {
     const nameMatch = searchName === "" || os.colaborador.toLowerCase().includes(searchName.toLowerCase());
     const cpfMatch = searchCpf === "" || os.cpf.includes(searchCpf);
-    const filialMatch = searchFilial === "" || os.filial === searchFilial;
+    const filialMatch = searchFilial === "all" || os.filial === searchFilial;
     
     return nameMatch && cpfMatch && filialMatch;
   });
@@ -91,7 +91,7 @@ const OSList = () => {
                           <SelectValue placeholder="Selecione a filial" />
                         </SelectTrigger>
                         <SelectContent>
-                          <SelectItem value="">Todas as filiais</SelectItem>
+                          <SelectItem value="all">Todas as filiais</SelectItem>
                           {filiais.map((filial) => (
                             <SelectItem key={filial} value={filial}>
                               {filial}
