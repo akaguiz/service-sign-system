@@ -6,24 +6,32 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Search, Plus, Eye, Edit, Printer } from "lucide-react";
 import { useOS } from "@/contexts/OSContext";
 import { SidebarProvider, SidebarTrigger, SidebarInset } from "@/components/ui/sidebar";
 import { AppSidebar } from "@/components/AppSidebar";
+import { generateOSPDF } from "@/utils/pdfGenerator";
+
+const filiais = ["Rio Centro", "Barra da Tijuca", "Ipanema"];
 
 const OSList = () => {
   const [searchName, setSearchName] = useState("");
   const [searchCpf, setSearchCpf] = useState("");
-  const [searchEmpresa, setSearchEmpresa] = useState("");
+  const [searchFilial, setSearchFilial] = useState("");
   const { osList } = useOS();
 
   const filteredOS = osList.filter(os => {
     const nameMatch = searchName === "" || os.colaborador.toLowerCase().includes(searchName.toLowerCase());
     const cpfMatch = searchCpf === "" || os.cpf.includes(searchCpf);
-    const empresaMatch = searchEmpresa === "" || os.empresa.toLowerCase().includes(searchEmpresa.toLowerCase());
+    const filialMatch = searchFilial === "" || os.filial === searchFilial;
     
-    return nameMatch && cpfMatch && empresaMatch;
+    return nameMatch && cpfMatch && filialMatch;
   });
+
+  const handlePrint = (os: any) => {
+    generateOSPDF(os);
+  };
 
   return (
     <SidebarProvider>
@@ -77,13 +85,20 @@ const OSList = () => {
                       />
                     </div>
                     <div className="space-y-2">
-                      <Label htmlFor="searchEmpresa">Empresa</Label>
-                      <Input
-                        id="searchEmpresa"
-                        placeholder="Digite o nome da empresa"
-                        value={searchEmpresa}
-                        onChange={(e) => setSearchEmpresa(e.target.value)}
-                      />
+                      <Label htmlFor="searchFilial">Filial</Label>
+                      <Select value={searchFilial} onValueChange={setSearchFilial}>
+                        <SelectTrigger>
+                          <SelectValue placeholder="Selecione a filial" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="">Todas as filiais</SelectItem>
+                          {filiais.map((filial) => (
+                            <SelectItem key={filial} value={filial}>
+                              {filial}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
                     </div>
                   </div>
                 </CardContent>
@@ -102,7 +117,7 @@ const OSList = () => {
                           <th className="text-left py-3 px-4 font-semibold">Colaborador</th>
                           <th className="text-left py-3 px-4 font-semibold">Função</th>
                           <th className="text-left py-3 px-4 font-semibold">CPF</th>
-                          <th className="text-left py-3 px-4 font-semibold">Empresa</th>
+                          <th className="text-left py-3 px-4 font-semibold">Filial</th>
                           <th className="text-left py-3 px-4 font-semibold">Status</th>
                           <th className="text-left py-3 px-4 font-semibold">Ações</th>
                         </tr>
@@ -113,7 +128,7 @@ const OSList = () => {
                             <td className="py-3 px-4">{os.colaborador}</td>
                             <td className="py-3 px-4">{os.funcao}</td>
                             <td className="py-3 px-4">{os.cpf}</td>
-                            <td className="py-3 px-4">{os.empresa}</td>
+                            <td className="py-3 px-4">{os.filial}</td>
                             <td className="py-3 px-4">
                               <Badge 
                                 variant={os.status === "assinada" ? "default" : "secondary"}
@@ -134,7 +149,12 @@ const OSList = () => {
                                     <Edit className="w-4 h-4" />
                                   </Button>
                                 </Link>
-                                <Button size="sm" variant="outline" title="Imprimir">
+                                <Button 
+                                  size="sm" 
+                                  variant="outline" 
+                                  title="Imprimir"
+                                  onClick={() => handlePrint(os)}
+                                >
                                   <Printer className="w-4 h-4" />
                                 </Button>
                               </div>

@@ -14,6 +14,8 @@ import { useOSConfig, OSTemplate } from "@/contexts/OSConfigContext";
 import { SidebarProvider, SidebarTrigger, SidebarInset } from "@/components/ui/sidebar";
 import { AppSidebar } from "@/components/AppSidebar";
 
+const filiais = ["Rio Centro", "Barra da Tijuca", "Ipanema"];
+
 const OSForm = () => {
   const navigate = useNavigate();
   const { id } = useParams();
@@ -26,6 +28,7 @@ const OSForm = () => {
   const [selectedTemplate, setSelectedTemplate] = useState<OSTemplate | null>(null);
   const [formData, setFormData] = useState({
     empresa: "",
+    filial: "",
     colaborador: "",
     cpf: cpfFromUrl || "",
     funcao: "",
@@ -45,6 +48,7 @@ const OSForm = () => {
       if (os) {
         setFormData({
           empresa: os.empresa,
+          filial: os.filial || "",
           colaborador: os.colaborador,
           cpf: os.cpf,
           funcao: os.funcao,
@@ -157,7 +161,7 @@ const OSForm = () => {
                     )}
 
                     {/* Dados básicos */}
-                    <div className="grid md:grid-cols-2 gap-4">
+                    <div className="grid md:grid-cols-3 gap-4">
                       <div className="space-y-2">
                         <Label htmlFor="empresa">Empresa *</Label>
                         <Input
@@ -167,6 +171,21 @@ const OSForm = () => {
                           placeholder="Nome da empresa"
                           required
                         />
+                      </div>
+                      <div className="space-y-2">
+                        <Label htmlFor="filial">Filial *</Label>
+                        <Select value={formData.filial} onValueChange={(value) => handleInputChange("filial", value)}>
+                          <SelectTrigger>
+                            <SelectValue placeholder="Selecione a filial" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            {filiais.map((filial) => (
+                              <SelectItem key={filial} value={filial}>
+                                {filial}
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
                       </div>
                       <div className="space-y-2">
                         <Label htmlFor="dataEmissao">Data de Emissão *</Label>
@@ -223,7 +242,6 @@ const OSForm = () => {
                           id="riscos"
                           value={formData.riscos}
                           onChange={(e) => handleInputChange("riscos", e.target.value)}
-                          placeholder="Descrição dos riscos identificados"
                           rows={3}
                         />
                       </div>
@@ -234,7 +252,6 @@ const OSForm = () => {
                           id="epis"
                           value={formData.epis}
                           onChange={(e) => handleInputChange("epis", e.target.value)}
-                          placeholder="Lista dos EPIs necessários"
                           rows={3}
                         />
                       </div>
@@ -245,7 +262,6 @@ const OSForm = () => {
                           id="obrigacoes"
                           value={formData.obrigacoes}
                           onChange={(e) => handleInputChange("obrigacoes", e.target.value)}
-                          placeholder="Descrição das obrigações do colaborador"
                           rows={4}
                         />
                       </div>
@@ -256,7 +272,6 @@ const OSForm = () => {
                           id="proibicoes"
                           value={formData.proibicoes}
                           onChange={(e) => handleInputChange("proibicoes", e.target.value)}
-                          placeholder="Lista das proibições"
                           rows={4}
                         />
                       </div>
@@ -267,7 +282,6 @@ const OSForm = () => {
                           id="penalidades"
                           value={formData.penalidades}
                           onChange={(e) => handleInputChange("penalidades", e.target.value)}
-                          placeholder="Descrição das penalidades aplicáveis"
                           rows={3}
                         />
                       </div>
@@ -278,7 +292,6 @@ const OSForm = () => {
                           id="termoRecebimento"
                           value={formData.termoRecebimento}
                           onChange={(e) => handleInputChange("termoRecebimento", e.target.value)}
-                          placeholder="Texto do termo de recebimento"
                           rows={4}
                         />
                       </div>
@@ -289,7 +302,6 @@ const OSForm = () => {
                           id="procedimentosAcidente"
                           value={formData.procedimentosAcidente}
                           onChange={(e) => handleInputChange("procedimentosAcidente", e.target.value)}
-                          placeholder="Procedimentos a serem seguidos em caso de acidente"
                           rows={4}
                         />
                       </div>

@@ -4,6 +4,7 @@ import React, { createContext, useContext, useState, ReactNode } from 'react';
 export interface OS {
   id: string;
   empresa: string;
+  filial: string;
   colaborador: string;
   cpf: string;
   funcao: string;
@@ -36,6 +37,7 @@ export const OSProvider = ({ children }: { children: ReactNode }) => {
     {
       id: '1',
       empresa: 'Empresa A Ltda',
+      filial: 'Rio Centro',
       colaborador: 'João Silva',
       cpf: '123.456.789-00',
       funcao: 'Técnico de Segurança',
@@ -52,6 +54,7 @@ export const OSProvider = ({ children }: { children: ReactNode }) => {
     {
       id: '2',
       empresa: 'Empresa B Ltda',
+      filial: 'Barra da Tijuca',
       colaborador: 'Maria Santos',
       cpf: '987.654.321-00',
       funcao: 'Operadora de Máquinas',
