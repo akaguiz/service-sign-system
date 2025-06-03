@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { useParams, Link } from "react-router-dom";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -87,13 +86,18 @@ const SignatureView = () => {
     <div className="min-h-screen bg-gray-50">
       {/* Header */}
       <header className="bg-primary shadow-sm">
-        <div className="container mx-auto px-4 py-4 flex items-center">
-          <Link to="/signature" className="mr-4">
-            <Button variant="outline" size="sm" className="text-primary border-white hover:bg-white">
-              <ArrowLeft className="w-4 h-4" />
-            </Button>
-          </Link>
-          <h1 className="text-2xl font-bold text-white">Ordem de Serviço</h1>
+        <div className="container mx-auto px-4 py-4 flex items-center justify-between">
+          <div className="flex items-center">
+            <Link to="/signature" className="mr-4">
+              <Button variant="outline" size="sm" className="text-primary border-white hover:bg-white">
+                <ArrowLeft className="w-4 h-4" />
+              </Button>
+            </Link>
+            <div>
+              <h1 className="text-2xl font-bold text-white">Ordem de Serviço</h1>
+              <p className="text-white/80">Filial: {osData.filial}</p>
+            </div>
+          </div>
         </div>
       </header>
 

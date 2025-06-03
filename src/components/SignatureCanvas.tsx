@@ -17,6 +17,7 @@ const SignatureCanvas: React.FC<SignatureCanvasProps> = ({
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [isDrawing, setIsDrawing] = useState(false);
   const [isEmpty, setIsEmpty] = useState(true);
+  const [lastPosition, setLastPosition] = useState({ x: 0, y: 0 });
 
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -30,44 +31,69 @@ const SignatureCanvas: React.FC<SignatureCanvasProps> = ({
     context.lineWidth = 2;
     context.lineCap = 'round';
     context.lineJoin = 'round';
+    context.imageSmoothingEnabled = true;
+    
+    // Limpar canvas inicialmente
+    context.fillStyle = '#ffffff';
+    context.fillRect(0, 0, canvas.width, canvas.height);
   }, []);
 
-  const startDrawing = (e: React.MouseEvent<HTMLCanvasElement>) => {
-    setIsDrawing(true);
+  const getMousePosition = (e: React.MouseEvent<HTMLCanvasElement>) => {
     const canvas = canvasRef.current;
-    if (!canvas) return;
+    if (!canvas) return { x: 0, y: 0 };
 
     const rect = canvas.getBoundingClientRect();
-    const x = e.clientX - rect.left;
-    const y = e.clientY - rect.top;
+    const scaleX = canvas.width / rect.width;
+    const scaleY = canvas.height / rect.height;
+    
+    return {
+      x: (e.clientX - rect.left) * scaleX,
+      y: (e.clientY - rect.top) * scaleY
+    };
+  };
+
+  const startDrawing = (e: React.MouseEvent<HTMLCanvasElement>) => {
+    e.preventDefault();
+    setIsDrawing(true);
+    
+    const position = getMousePosition(e);
+    setLastPosition(position);
+
+    const canvas = canvasRef.current;
+    if (!canvas) return;
 
     const context = canvas.getContext('2d');
     if (context) {
       context.beginPath();
-      context.moveTo(x, y);
+      context.moveTo(position.x, position.y);
     }
   };
 
   const draw = (e: React.MouseEvent<HTMLCanvasElement>) => {
     if (!isDrawing) return;
+    e.preventDefault();
 
     const canvas = canvasRef.current;
     if (!canvas) return;
 
-    const rect = canvas.getBoundingClientRect();
-    const x = e.clientX - rect.left;
-    const y = e.clientY - rect.top;
-
+    const position = getMousePosition(e);
     const context = canvas.getContext('2d');
+    
     if (context) {
-      context.lineTo(x, y);
+      // Desenhar linha suave entre a última posição e a atual
+      context.beginPath();
+      context.moveTo(lastPosition.x, lastPosition.y);
+      context.lineTo(position.x, position.y);
       context.stroke();
+      
+      setLastPosition(position);
       setIsEmpty(false);
       onSignatureChange(canvas.toDataURL());
     }
   };
 
-  const stopDrawing = () => {
+  const stopDrawing = (e: React.MouseEvent<HTMLCanvasElement>) => {
+    e.preventDefault();
     setIsDrawing(false);
   };
 
@@ -77,7 +103,8 @@ const SignatureCanvas: React.FC<SignatureCanvasProps> = ({
 
     const context = canvas.getContext('2d');
     if (context) {
-      context.clearRect(0, 0, canvas.width, canvas.height);
+      context.fillStyle = '#ffffff';
+      context.fillRect(0, 0, canvas.width, canvas.height);
       setIsEmpty(true);
       onSignatureChange('');
     }
@@ -90,15 +117,17 @@ const SignatureCanvas: React.FC<SignatureCanvasProps> = ({
           ref={canvasRef}
           width={width}
           height={height}
-          className="border border-gray-200 rounded w-full"
+          className="border border-gray-200 rounded w-full cursor-crosshair select-none"
           style={{ 
             touchAction: 'none',
-            cursor: 'crosshair'
+            maxWidth: '100%',
+            height: 'auto'
           }}
           onMouseDown={startDrawing}
           onMouseMove={draw}
           onMouseUp={stopDrawing}
           onMouseLeave={stopDrawing}
+          onContextMenu={(e) => e.preventDefault()}
         />
       </div>
       <div className="flex justify-between items-center">

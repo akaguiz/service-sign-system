@@ -9,7 +9,7 @@ export interface OSField {
 
 export interface OSTemplate {
   id: string;
-  empresa: string;
+  filial: string;
   nome: string;
   fields: OSField[];
   createdAt: string;
@@ -19,8 +19,9 @@ interface OSConfigContextType {
   templates: OSTemplate[];
   addTemplate: (template: Omit<OSTemplate, 'id' | 'createdAt'>) => void;
   updateTemplate: (id: string, updates: Partial<OSTemplate>) => void;
-  getTemplateByEmpresa: (empresa: string) => OSTemplate | undefined;
+  getTemplateByFilial: (filial: string) => OSTemplate | undefined;
   deleteTemplate: (id: string) => void;
+  getFiliais: () => string[];
 }
 
 const defaultFields: OSField[] = [
@@ -33,14 +34,25 @@ const defaultFields: OSField[] = [
   { id: 'procedimentosAcidente', label: 'Procedimentos em Caso de Acidente', content: '' },
 ];
 
+const filiais = [
+  'Rio Centro',
+  'Barra da Tijuca',
+  'Copacabana',
+  'Ipanema',
+  'Tijuca',
+  'Vila Isabel',
+  'Méier',
+  'Campo Grande'
+];
+
 const OSConfigContext = createContext<OSConfigContextType | undefined>(undefined);
 
 export const OSConfigProvider = ({ children }: { children: ReactNode }) => {
   const [templates, setTemplates] = useState<OSTemplate[]>([
     {
       id: '1',
-      empresa: 'Empresa A Ltda',
-      nome: 'Modelo Padrão - Empresa A',
+      filial: 'Rio Centro',
+      nome: 'Modelo Padrão - Rio Centro',
       fields: defaultFields,
       createdAt: '2024-05-30'
     }
@@ -61,12 +73,16 @@ export const OSConfigProvider = ({ children }: { children: ReactNode }) => {
     ));
   };
 
-  const getTemplateByEmpresa = (empresa: string) => {
-    return templates.find(template => template.empresa === empresa);
+  const getTemplateByFilial = (filial: string) => {
+    return templates.find(template => template.filial === filial);
   };
 
   const deleteTemplate = (id: string) => {
     setTemplates(prev => prev.filter(template => template.id !== id));
+  };
+
+  const getFiliais = () => {
+    return filiais;
   };
 
   return (
@@ -74,8 +90,9 @@ export const OSConfigProvider = ({ children }: { children: ReactNode }) => {
       templates,
       addTemplate,
       updateTemplate,
-      getTemplateByEmpresa,
-      deleteTemplate
+      getTemplateByFilial,
+      deleteTemplate,
+      getFiliais
     }}>
       {children}
     </OSConfigContext.Provider>

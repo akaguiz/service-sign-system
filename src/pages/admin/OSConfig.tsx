@@ -1,9 +1,11 @@
+
 import { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Settings, Plus, Edit, Trash2 } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
 import { useOSConfig, OSField } from "@/contexts/OSConfigContext";
@@ -11,14 +13,16 @@ import { SidebarProvider, SidebarTrigger, SidebarInset } from "@/components/ui/s
 import { AppSidebar } from "@/components/AppSidebar";
 
 const OSConfig = () => {
-  const { templates, addTemplate, updateTemplate, deleteTemplate } = useOSConfig();
+  const { templates, addTemplate, updateTemplate, deleteTemplate, getFiliais } = useOSConfig();
   const [isCreating, setIsCreating] = useState(false);
   const [editingTemplate, setEditingTemplate] = useState<string | null>(null);
   const [formData, setFormData] = useState({
-    empresa: "",
+    filial: "",
     nome: "",
     fields: [] as OSField[]
   });
+
+  const filiais = getFiliais();
 
   const defaultFields: OSField[] = [
     { id: 'riscos', label: 'Riscos Identificados', content: '' },
@@ -34,7 +38,7 @@ const OSConfig = () => {
     setIsCreating(true);
     setEditingTemplate(null);
     setFormData({
-      empresa: "",
+      filial: "",
       nome: "",
       fields: [...defaultFields]
     });
@@ -46,7 +50,7 @@ const OSConfig = () => {
       setEditingTemplate(templateId);
       setIsCreating(false);
       setFormData({
-        empresa: template.empresa,
+        filial: template.filial,
         nome: template.nome,
         fields: [...template.fields]
       });
@@ -63,7 +67,7 @@ const OSConfig = () => {
   };
 
   const handleSave = () => {
-    if (!formData.empresa || !formData.nome) {
+    if (!formData.filial || !formData.nome) {
       toast({
         title: "Erro",
         description: "Por favor, preencha todos os campos obrigatórios.",
@@ -142,13 +146,22 @@ const OSConfig = () => {
                   <CardContent className="space-y-6">
                     <div className="grid md:grid-cols-2 gap-4">
                       <div className="space-y-2">
-                        <Label htmlFor="empresa">Empresa *</Label>
-                        <Input
-                          id="empresa"
-                          value={formData.empresa}
-                          onChange={(e) => setFormData(prev => ({ ...prev, empresa: e.target.value }))}
-                          placeholder="Nome da empresa"
-                        />
+                        <Label htmlFor="filial">Filial *</Label>
+                        <Select 
+                          value={formData.filial} 
+                          onValueChange={(value) => setFormData(prev => ({ ...prev, filial: value }))}
+                        >
+                          <SelectTrigger>
+                            <SelectValue placeholder="Selecione a filial" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            {filiais.map((filial) => (
+                              <SelectItem key={filial} value={filial}>
+                                {filial}
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
                       </div>
                       <div className="space-y-2">
                         <Label htmlFor="nome">Nome do Modelo *</Label>
@@ -211,7 +224,7 @@ const OSConfig = () => {
                           <div key={template.id} className="flex items-center justify-between p-4 border rounded-lg hover:bg-gray-50">
                             <div>
                               <h3 className="font-semibold">{template.nome}</h3>
-                              <p className="text-gray-600">{template.empresa}</p>
+                              <p className="text-gray-600">{template.filial}</p>
                               <p className="text-sm text-gray-500">
                                 {template.fields.filter(f => f.content.trim() !== '').length} campos configurados
                               </p>

@@ -2,11 +2,26 @@
 import { Link } from "react-router-dom";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { FileText, Users } from "lucide-react";
+import { FileText, Users, Building } from "lucide-react";
 
 const Index = () => {
   return (
     <div className="min-h-screen bg-gradient-to-br from-primary-light to-white">
+      {/* Header com logo */}
+      <header className="bg-white shadow-sm border-b">
+        <div className="container mx-auto px-4 py-4 flex items-center">
+          <div className="flex items-center">
+            <div className="w-12 h-12 bg-primary rounded-lg flex items-center justify-center mr-3">
+              <Building className="w-8 h-8 text-white" />
+            </div>
+            <div>
+              <h1 className="text-xl font-bold text-gray-800">Sistema OS</h1>
+              <p className="text-sm text-gray-600">Gerenciador de Ordens de Serviço</p>
+            </div>
+          </div>
+        </div>
+      </header>
+
       <div className="container mx-auto px-4 py-16">
         <div className="text-center mb-16">
           <h1 className="text-5xl font-bold text-gray-800 mb-4 animate-fade-in">
