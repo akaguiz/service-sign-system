@@ -1,4 +1,3 @@
-
 import React, { createContext, useContext, useState, ReactNode } from 'react';
 
 export interface OS {
@@ -102,6 +101,7 @@ export const OSProvider = ({ children }: { children: ReactNode }) => {
       numero: generateOSNumber(),
       status: 'pendente'
     };
+    console.log('Adicionando nova OS:', newOS);
     setOSList(prev => [...prev, newOS]);
   };
 
@@ -137,7 +137,11 @@ export const OSProvider = ({ children }: { children: ReactNode }) => {
     console.log('Lista de colaboradores disponíveis:', colaboradores.map(col => ({ cpf: col.cpf, nome: col.nome, funcao: col.funcao })));
     
     const normalizedSearchCPF = cpf.replace(/\D/g, '');
-    const foundCollaborator = colaboradores.find(col => col.cpf.replace(/\D/g, '') === normalizedSearchCPF);
+    const foundCollaborator = colaboradores.find(col => {
+      const normalizedColCPF = col.cpf.replace(/\D/g, '');
+      console.log(`Comparando colaborador: ${normalizedSearchCPF} com ${normalizedColCPF}`);
+      return normalizedColCPF === normalizedSearchCPF;
+    });
     
     console.log('Colaborador encontrado:', foundCollaborator);
     return foundCollaborator;

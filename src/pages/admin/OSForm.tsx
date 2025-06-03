@@ -21,7 +21,7 @@ const OSForm = () => {
   const { id } = useParams();
   const [searchParams] = useSearchParams();
   const cpfFromUrl = searchParams.get('cpf');
-  const { addOS, updateOS, getOSById, getCollaboratorByCPF } = useOS();
+  const { addOS, updateOS, getOSById, getOSByCPF, getCollaboratorByCPF } = useOS();
   const { templates } = useOSConfig();
   const isEditing = !!id;
 
@@ -44,16 +44,42 @@ const OSForm = () => {
   // Preencher dados do colaborador quando CPF for fornecido
   useEffect(() => {
     if (cpfFromUrl && !isEditing) {
-      const colaborador = getCollaboratorByCPF(cpfFromUrl);
-      if (colaborador) {
+      console.log('Iniciando busca de dados para CPF:', cpfFromUrl);
+      
+      // 1. Primeiro, busca se já existe uma OS para esse CPF
+      const osExistente = getOSByCPF(cpfFromUrl);
+      
+      if (osExistente) {
+        console.log('OS existente encontrada, preenchendo dados da OS');
         setFormData(prev => ({
           ...prev,
-          colaborador: colaborador.nome,
-          funcao: colaborador.funcao
+          colaborador: osExistente.colaborador,
+          funcao: osExistente.funcao
         }));
+      } else {
+        // 2. Se não existe OS, busca na base de colaboradores
+        console.log('Nenhuma OS encontrada, buscando na base de colaboradores');
+        const colaborador = getCollaboratorByCPF(cpfFromUrl);
+        
+        if (colaborador) {
+          console.log('Colaborador encontrado na base, preenchendo dados');
+          setFormData(prev => ({
+            ...prev,
+            colaborador: colaborador.nome,
+            funcao: colaborador.funcao
+          }));
+        } else {
+          // 3. Se não encontra nem OS nem colaborador, deixa campos vazios
+          console.log('CPF não localizado, deixando campos vazios');
+          setFormData(prev => ({
+            ...prev,
+            colaborador: "",
+            funcao: ""
+          }));
+        }
       }
     }
-  }, [cpfFromUrl, isEditing, getCollaboratorByCPF]);
+  }, [cpfFromUrl, isEditing, getOSByCPF, getCollaboratorByCPF]);
 
   useEffect(() => {
     if (isEditing && id) {
@@ -209,7 +235,6 @@ const OSForm = () => {
                           onChange={(e) => handleInputChange("colaborador", e.target.value)}
                           placeholder="Nome completo do colaborador"
                           required
-                          disabled={!!cpfFromUrl && !isEditing}
                         />
                       </div>
                       <div className="space-y-2">
@@ -232,7 +257,6 @@ const OSForm = () => {
                           onChange={(e) => handleInputChange("funcao", e.target.value)}
                           placeholder="Função do colaborador"
                           required
-                          disabled={!!cpfFromUrl && !isEditing}
                         />
                       </div>
                     </div>
