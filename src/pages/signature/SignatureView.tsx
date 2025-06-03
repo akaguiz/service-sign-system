@@ -102,7 +102,7 @@ const SignatureView = () => {
           <CardHeader>
             <CardTitle className="flex items-center">
               <CheckCircle className="w-6 h-6 mr-2 text-primary" />
-              Ordem de Serviço - {osData.empresa}
+              Ordem de Serviço - {osData.filial}
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-6">

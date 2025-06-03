@@ -81,7 +81,7 @@ export const generateOSPDF = (os: OS) => {
     <body>
       <div class="header">
         <div class="title">ORDEM DE SERVIÇO</div>
-        <div>${os.empresa} - Filial: ${os.filial}</div>
+        <div>${os.filial}</div>
       </div>
 
       <div class="info-grid">

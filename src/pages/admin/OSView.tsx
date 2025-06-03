@@ -13,7 +13,7 @@ const OSView = () => {
   const { getTemplateByEmpresa } = useOSConfig();
   
   const osData = id ? getOSById(id) : undefined;
-  const template = osData ? getTemplateByEmpresa(osData.empresa) : undefined;
+  const template = osData ? getTemplateByEmpresa(osData.filial) : undefined;
 
   if (!osData) {
     return (
@@ -91,7 +91,7 @@ const OSView = () => {
             <div className="flex justify-between items-start">
               <div className="flex items-center">
                 <FileText className="w-6 h-6 mr-2 text-primary" />
-                <CardTitle>OS #{osData.id} - {osData.empresa}</CardTitle>
+                <CardTitle>OS #{osData.numero} - {osData.filial}</CardTitle>
               </div>
               <Badge 
                 variant={osData.status === "assinada" ? "default" : "secondary"}
