@@ -1,4 +1,3 @@
-
 import React, { createContext, useContext, useState, ReactNode } from 'react';
 
 export interface OSField {
@@ -25,8 +24,6 @@ interface OSConfigContextType {
 }
 
 const defaultFields: OSField[] = [
-  { id: 'riscos', label: 'Riscos Identificados', content: '' },
-  { id: 'epis', label: 'Equipamentos de Proteção (EPIs)', content: '' },
   { id: 'obrigacoes', label: 'Obrigações do Colaborador', content: '' },
   { id: 'proibicoes', label: 'Proibições', content: '' },
   { id: 'penalidades', label: 'Penalidades', content: '' },

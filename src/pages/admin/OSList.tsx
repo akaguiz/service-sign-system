@@ -7,11 +7,12 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Search, Plus, Eye, Edit, Printer } from "lucide-react";
+import { Search, Plus, Eye, Edit, Printer, Trash2 } from "lucide-react";
 import { useOS } from "@/contexts/OSContext";
 import { SidebarProvider, SidebarTrigger, SidebarInset } from "@/components/ui/sidebar";
 import { AppSidebar } from "@/components/AppSidebar";
 import { generateOSPDF } from "@/utils/pdfGenerator";
+import { toast } from "@/hooks/use-toast";
 
 const filiais = ["Rio Centro", "Barra da Tijuca", "Ipanema"];
 
@@ -19,7 +20,7 @@ const OSList = () => {
   const [searchName, setSearchName] = useState("");
   const [searchCpf, setSearchCpf] = useState("");
   const [searchFilial, setSearchFilial] = useState("all");
-  const { osList } = useOS();
+  const { osList, deleteOS } = useOS();
 
   const filteredOS = osList.filter(os => {
     const nameMatch = searchName === "" || os.colaborador.toLowerCase().includes(searchName.toLowerCase());
@@ -31,6 +32,25 @@ const OSList = () => {
 
   const handlePrint = (os: any) => {
     generateOSPDF(os);
+  };
+
+  const handleDelete = (os: any) => {
+    if (os.status === 'assinada') {
+      toast({
+        title: "Erro",
+        description: "Não é possível excluir uma OS já assinada.",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    if (confirm(`Tem certeza que deseja excluir a OS ${os.numero} de ${os.colaborador}?`)) {
+      deleteOS(os.id);
+      toast({
+        title: "OS excluída",
+        description: "A ordem de serviço foi excluída com sucesso."
+      });
+    }
   };
 
   return (
@@ -46,7 +66,7 @@ const OSList = () => {
                   <SidebarTrigger className="mr-4 text-white hover:bg-white/10" />
                   <h1 className="text-2xl font-bold text-white">Ordens de Serviço</h1>
                 </div>
-                <Link to="/admin/os/new">
+                <Link to="/admin/cpf-search">
                   <Button variant="outline" size="sm" className="text-primary border-white hover:bg-white">
                     <Plus className="w-4 h-4 mr-2" />
                     Nova OS
@@ -159,6 +179,17 @@ const OSList = () => {
                                 >
                                   <Printer className="w-4 h-4" />
                                 </Button>
+                                {os.status === 'pendente' && (
+                                  <Button 
+                                    size="sm" 
+                                    variant="outline" 
+                                    title="Excluir"
+                                    onClick={() => handleDelete(os)}
+                                    className="text-red-600 hover:text-red-700"
+                                  >
+                                    <Trash2 className="w-4 h-4" />
+                                  </Button>
+                                )}
                               </div>
                             </td>
                           </tr>

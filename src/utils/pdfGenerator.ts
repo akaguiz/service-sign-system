@@ -73,6 +73,21 @@ export const generateOSPDF = (os: OS) => {
           margin: 0 auto 10px;
           height: 20px;
         }
+        .digital-signature {
+          border: 2px solid #007bff;
+          padding: 15px;
+          margin: 20px auto;
+          width: 300px;
+          text-align: center;
+          background-color: #f8f9fa;
+          border-radius: 5px;
+        }
+        .signature-info {
+          margin-top: 20px;
+          text-align: center;
+          color: #28a745;
+          font-weight: bold;
+        }
         @media print {
           body { margin: 0; }
         }
@@ -139,15 +154,21 @@ export const generateOSPDF = (os: OS) => {
       </div>
 
       <div class="signature-section">
-        <div class="signature-line">
-          <div class="line"></div>
-          <div>Assinatura do Colaborador</div>
-        </div>
-        ${os.status === 'assinada' ? `
-          <div style="margin-top: 20px; text-align: center;">
-            <strong>Documento assinado em: ${os.dataAssinatura ? new Date(os.dataAssinatura).toLocaleDateString('pt-BR') : ''}</strong>
+        ${os.status === 'assinada' && os.assinatura ? `
+          <div class="digital-signature">
+            <div style="font-size: 18px; margin-bottom: 10px;">✓ DOCUMENTO ASSINADO DIGITALMENTE</div>
+            <div style="font-size: 14px; margin-bottom: 5px;">Assinatura: <strong>${os.assinatura}</strong></div>
+            <div style="font-size: 12px;">Data: ${os.dataAssinatura ? new Date(os.dataAssinatura).toLocaleDateString('pt-BR') : ''}</div>
           </div>
-        ` : ''}
+          <div class="signature-info">
+            Este documento foi assinado digitalmente em ${os.dataAssinatura ? new Date(os.dataAssinatura).toLocaleDateString('pt-BR') : ''}
+          </div>
+        ` : `
+          <div class="signature-line">
+            <div class="line"></div>
+            <div>Assinatura do Colaborador</div>
+          </div>
+        `}
       </div>
     </body>
     </html>

@@ -24,6 +24,7 @@ interface OSContextType {
   osList: OS[];
   addOS: (os: Omit<OS, 'id' | 'status' | 'numero'>) => void;
   updateOS: (id: string, os: Partial<OS>) => void;
+  deleteOS: (id: string) => void;
   getOSById: (id: string) => OS | undefined;
   getOSByCPF: (cpf: string) => OS | undefined;
   searchOS: (colaborador: string, cpf: string) => OS[];
@@ -111,6 +112,10 @@ export const OSProvider = ({ children }: { children: ReactNode }) => {
     ));
   };
 
+  const deleteOS = (id: string) => {
+    setOSList(prev => prev.filter(os => os.id !== id));
+  };
+
   const getOSById = (id: string) => {
     return osList.find(os => os.id === id);
   };
@@ -159,6 +164,7 @@ export const OSProvider = ({ children }: { children: ReactNode }) => {
       osList,
       addOS,
       updateOS,
+      deleteOS,
       getOSById,
       getOSByCPF,
       searchOS,

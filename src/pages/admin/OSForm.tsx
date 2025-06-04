@@ -141,6 +141,11 @@ const OSForm = () => {
     handleInputChange("cpf", formatted);
   };
 
+  const isFieldFromTemplate = (fieldId: string) => {
+    if (!selectedTemplate) return false;
+    return selectedTemplate.fields.some(field => field.id === fieldId && field.content.trim() !== '');
+  };
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     
@@ -276,72 +281,99 @@ const OSForm = () => {
                     {/* Campos de texto */}
                     <div className="space-y-4">
                       <div className="space-y-2">
-                        <Label htmlFor="riscos">Riscos</Label>
+                        <Label htmlFor="riscos">Riscos Identificados *</Label>
                         <Textarea
                           id="riscos"
                           value={formData.riscos}
                           onChange={(e) => handleInputChange("riscos", e.target.value)}
                           rows={3}
+                          required
                         />
                       </div>
 
                       <div className="space-y-2">
-                        <Label htmlFor="epis">Equipamentos de Proteção (EPIs)</Label>
+                        <Label htmlFor="epis">Equipamentos de Proteção (EPIs) *</Label>
                         <Textarea
                           id="epis"
                           value={formData.epis}
                           onChange={(e) => handleInputChange("epis", e.target.value)}
                           rows={3}
+                          required
                         />
                       </div>
 
                       <div className="space-y-2">
-                        <Label htmlFor="obrigacoes">Obrigações do Colaborador</Label>
+                        <Label htmlFor="obrigacoes">
+                          Obrigações do Colaborador
+                          {isFieldFromTemplate('obrigacoes') && <span className="text-sm text-gray-500 ml-2">(do modelo)</span>}
+                        </Label>
                         <Textarea
                           id="obrigacoes"
                           value={formData.obrigacoes}
                           onChange={(e) => handleInputChange("obrigacoes", e.target.value)}
                           rows={4}
+                          disabled={isFieldFromTemplate('obrigacoes')}
+                          className={isFieldFromTemplate('obrigacoes') ? "bg-gray-100" : ""}
                         />
                       </div>
 
                       <div className="space-y-2">
-                        <Label htmlFor="proibicoes">Proibições</Label>
+                        <Label htmlFor="proibicoes">
+                          Proibições
+                          {isFieldFromTemplate('proibicoes') && <span className="text-sm text-gray-500 ml-2">(do modelo)</span>}
+                        </Label>
                         <Textarea
                           id="proibicoes"
                           value={formData.proibicoes}
                           onChange={(e) => handleInputChange("proibicoes", e.target.value)}
                           rows={4}
+                          disabled={isFieldFromTemplate('proibicoes')}
+                          className={isFieldFromTemplate('proibicoes') ? "bg-gray-100" : ""}
                         />
                       </div>
 
                       <div className="space-y-2">
-                        <Label htmlFor="penalidades">Penalidades</Label>
+                        <Label htmlFor="penalidades">
+                          Penalidades
+                          {isFieldFromTemplate('penalidades') && <span className="text-sm text-gray-500 ml-2">(do modelo)</span>}
+                        </Label>
                         <Textarea
                           id="penalidades"
                           value={formData.penalidades}
                           onChange={(e) => handleInputChange("penalidades", e.target.value)}
                           rows={3}
+                          disabled={isFieldFromTemplate('penalidades')}
+                          className={isFieldFromTemplate('penalidades') ? "bg-gray-100" : ""}
                         />
                       </div>
 
                       <div className="space-y-2">
-                        <Label htmlFor="termoRecebimento">Termo de Recebimento e Compromisso</Label>
+                        <Label htmlFor="termoRecebimento">
+                          Termo de Recebimento e Compromisso
+                          {isFieldFromTemplate('termoRecebimento') && <span className="text-sm text-gray-500 ml-2">(do modelo)</span>}
+                        </Label>
                         <Textarea
                           id="termoRecebimento"
                           value={formData.termoRecebimento}
                           onChange={(e) => handleInputChange("termoRecebimento", e.target.value)}
                           rows={4}
+                          disabled={isFieldFromTemplate('termoRecebimento')}
+                          className={isFieldFromTemplate('termoRecebimento') ? "bg-gray-100" : ""}
                         />
                       </div>
 
                       <div className="space-y-2">
-                        <Label htmlFor="procedimentosAcidente">Procedimentos em Caso de Acidente</Label>
+                        <Label htmlFor="procedimentosAcidente">
+                          Procedimentos em Caso de Acidente
+                          {isFieldFromTemplate('procedimentosAcidente') && <span className="text-sm text-gray-500 ml-2">(do modelo)</span>}
+                        </Label>
                         <Textarea
                           id="procedimentosAcidente"
                           value={formData.procedimentosAcidente}
                           onChange={(e) => handleInputChange("procedimentosAcidente", e.target.value)}
                           rows={4}
+                          disabled={isFieldFromTemplate('procedimentosAcidente')}
+                          className={isFieldFromTemplate('procedimentosAcidente') ? "bg-gray-100" : ""}
                         />
                       </div>
                     </div>
