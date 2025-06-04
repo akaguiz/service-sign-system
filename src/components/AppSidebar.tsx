@@ -49,7 +49,7 @@ export function AppSidebar() {
         <div className="flex items-center gap-2 px-4 py-2">
           <div className="flex h-8 w-8 items-center justify-center rounded-lg overflow-hidden">
             <img 
-              src="https://images.unsplash.com/photo-1486312338219-ce68d2c6f44d?w=32&h=32&fit=crop&crop=center" 
+              src="https://scontent.fcgh15-1.fna.fbcdn.net/v/t39.30808-6/275720226_156982293380916_8709792050201814711_n.jpg?_nc_cat=100&ccb=1-7&_nc_sid=6ee11a&_nc_ohc=qYJQ1i3-7D0Q7kNvwFR23JM&_nc_oc=AdnfC2FBUH0nZoiNimBdOAVSt97C1IQmpOYeatOZ2-V_S6bVNNelxoruCio5I1TYW_U&_nc_zt=23&_nc_ht=scontent.fcgh15-1.fna&_nc_gid=dQyVVAr3pWNN5oqks1jj6g&oh=00_AfJs9gDR-lvdjERfYDo9torqwoVFZBtRLE3LQhS9XAqImA&oe=68455D9C" 
               alt="Logo" 
               className="h-full w-full object-cover"
             />
