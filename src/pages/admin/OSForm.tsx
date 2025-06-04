@@ -104,6 +104,7 @@ const OSForm = () => {
           procedimentosAcidente: os.procedimentosAcidente,
           dataEmissao: os.dataEmissao
         });
+        setIsDataFromExistingSource(true); // Durante edição, campos ficam bloqueados
       }
     }
   }, [isEditing, id, getOSById]);
@@ -256,7 +257,7 @@ const OSForm = () => {
                           placeholder="000.000.000-00"
                           maxLength={14}
                           required
-                          disabled={!!cpfFromUrl}
+                          disabled={!!cpfFromUrl || isDataFromExistingSource}
                         />
                       </div>
                       <div className="space-y-2">

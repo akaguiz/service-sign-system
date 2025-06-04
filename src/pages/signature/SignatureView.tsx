@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { useParams, Link } from "react-router-dom";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -118,6 +119,7 @@ const SignatureView = () => {
                   <p><strong>CPF:</strong> {osData.cpf}</p>
                 </div>
                 <div>
+                  <p><strong>Filial:</strong> {osData.filial}</p>
                   <p><strong>Função:</strong> {osData.funcao}</p>
                   <p><strong>Data de Emissão:</strong> {new Date(osData.dataEmissao).toLocaleDateString('pt-BR')}</p>
                 </div>
