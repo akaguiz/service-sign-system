@@ -1,9 +1,11 @@
+
 import React, { createContext, useContext, useState, ReactNode } from 'react';
 
 export interface OSField {
   id: string;
   label: string;
   content: string;
+  active: boolean;
 }
 
 export interface OSTemplate {
@@ -24,11 +26,11 @@ interface OSConfigContextType {
 }
 
 const defaultFields: OSField[] = [
-  { id: 'obrigacoes', label: 'Obrigações do Colaborador', content: '' },
-  { id: 'proibicoes', label: 'Proibições', content: '' },
-  { id: 'penalidades', label: 'Penalidades', content: '' },
-  { id: 'termoRecebimento', label: 'Termo de Recebimento', content: '' },
-  { id: 'procedimentosAcidente', label: 'Procedimentos em Caso de Acidente', content: '' },
+  { id: 'obrigacoes', label: 'Obrigações do Colaborador', content: '', active: true },
+  { id: 'proibicoes', label: 'Proibições', content: '', active: true },
+  { id: 'penalidades', label: 'Penalidades', content: '', active: true },
+  { id: 'termoRecebimento', label: 'Termo de Recebimento', content: '', active: true },
+  { id: 'procedimentosAcidente', label: 'Procedimentos em Caso de Acidente', content: '', active: true },
 ];
 
 const filiais = [

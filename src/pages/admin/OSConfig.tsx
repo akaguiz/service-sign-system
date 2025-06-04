@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
+import { Checkbox } from "@/components/ui/checkbox";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Settings, Plus, Edit, Trash2 } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
@@ -25,13 +26,11 @@ const OSConfig = () => {
   const filiais = getFiliais();
 
   const defaultFields: OSField[] = [
-    { id: 'riscos', label: 'Riscos Identificados', content: '' },
-    { id: 'epis', label: 'Equipamentos de Proteção (EPIs)', content: '' },
-    { id: 'obrigacoes', label: 'Obrigações do Colaborador', content: '' },
-    { id: 'proibicoes', label: 'Proibições', content: '' },
-    { id: 'penalidades', label: 'Penalidades', content: '' },
-    { id: 'termoRecebimento', label: 'Termo de Recebimento', content: '' },
-    { id: 'procedimentosAcidente', label: 'Procedimentos em Caso de Acidente', content: '' },
+    { id: 'obrigacoes', label: 'Obrigações do Colaborador', content: '', active: true },
+    { id: 'proibicoes', label: 'Proibições', content: '', active: true },
+    { id: 'penalidades', label: 'Penalidades', content: '', active: true },
+    { id: 'termoRecebimento', label: 'Termo de Recebimento', content: '', active: true },
+    { id: 'procedimentosAcidente', label: 'Procedimentos em Caso de Acidente', content: '', active: true },
   ];
 
   const startCreating = () => {
@@ -62,6 +61,15 @@ const OSConfig = () => {
       ...prev,
       fields: prev.fields.map(field =>
         field.id === fieldId ? { ...field, content } : field
+      )
+    }));
+  };
+
+  const handleFieldActiveChange = (fieldId: string, active: boolean) => {
+    setFormData(prev => ({
+      ...prev,
+      fields: prev.fields.map(field =>
+        field.id === fieldId ? { ...field, active } : field
       )
     }));
   };
@@ -179,17 +187,26 @@ const OSConfig = () => {
                       <div className="space-y-4">
                         {formData.fields.map((field) => (
                           <div key={field.id} className="space-y-2">
-                            <Label htmlFor={`content-${field.id}`} className="font-medium">
-                              {field.label}
-                            </Label>
-                            <Textarea
-                              id={`content-${field.id}`}
-                              value={field.content}
-                              onChange={(e) => handleFieldContentChange(field.id, e.target.value)}
-                              placeholder={`Configurações para ${field.label}`}
-                              rows={3}
-                              className="w-full"
-                            />
+                            <div className="flex items-center space-x-2">
+                              <Checkbox
+                                id={`active-${field.id}`}
+                                checked={field.active}
+                                onCheckedChange={(checked) => handleFieldActiveChange(field.id, checked as boolean)}
+                              />
+                              <Label htmlFor={`active-${field.id}`} className="font-medium">
+                                {field.label}
+                              </Label>
+                            </div>
+                            {field.active && (
+                              <Textarea
+                                id={`content-${field.id}`}
+                                value={field.content}
+                                onChange={(e) => handleFieldContentChange(field.id, e.target.value)}
+                                placeholder={`Configurações para ${field.label}`}
+                                rows={3}
+                                className="w-full"
+                              />
+                            )}
                           </div>
                         ))}
                       </div>
@@ -226,7 +243,7 @@ const OSConfig = () => {
                               <h3 className="font-semibold">{template.nome}</h3>
                               <p className="text-gray-600">{template.filial}</p>
                               <p className="text-sm text-gray-500">
-                                {template.fields.filter(f => f.content.trim() !== '').length} campos configurados
+                                {template.fields.filter(f => f.active && f.content.trim() !== '').length} campos ativos configurados
                               </p>
                             </div>
                             <div className="flex space-x-2">

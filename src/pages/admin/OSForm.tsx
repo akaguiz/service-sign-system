@@ -19,7 +19,7 @@ const OSForm = () => {
   const { id } = useParams();
   const [searchParams] = useSearchParams();
   const cpfFromUrl = searchParams.get('cpf');
-  const { addOS, updateOS, getOSById, getOSByCPF, getCollaboratorByCPF } = useOS();
+  const { addOS, updateOS, getOSById, getOSByCPF, getCollaboratorByCPF, osList } = useOS();
   const { templates, getFiliais } = useOSConfig();
   const isEditing = !!id;
 
@@ -40,10 +40,31 @@ const OSForm = () => {
     dataEmissao: new Date().toISOString().split('T')[0]
   });
 
+  // Verificar se já existe OS pendente para o CPF
+  const checkPendingOS = (cpf: string) => {
+    const cleanCPF = cpf.replace(/\D/g, '');
+    return osList.find(os => {
+      const normalizedOSCPF = os.cpf.replace(/\D/g, '');
+      return normalizedOSCPF === cleanCPF && os.status === 'pendente';
+    });
+  };
+
   // Preencher dados do colaborador quando CPF for fornecido
   useEffect(() => {
     if (cpfFromUrl && !isEditing) {
       console.log('Iniciando busca de dados para CPF:', cpfFromUrl);
+      
+      // Verificar se já existe OS pendente
+      const pendingOS = checkPendingOS(cpfFromUrl);
+      if (pendingOS) {
+        toast({
+          title: "Não é possível criar a OS",
+          description: "Já existe uma OS pendente de assinatura para este CPF.",
+          variant: "destructive"
+        });
+        navigate("/admin/os");
+        return;
+      }
       
       // 1. Primeiro, busca se já existe uma OS para esse CPF
       const osExistente = getOSByCPF(cpfFromUrl);
@@ -84,7 +105,7 @@ const OSForm = () => {
         }
       }
     }
-  }, [cpfFromUrl, isEditing, getOSByCPF, getCollaboratorByCPF]);
+  }, [cpfFromUrl, isEditing, getOSByCPF, getCollaboratorByCPF, osList, navigate]);
 
   useEffect(() => {
     if (isEditing && id) {
@@ -113,11 +134,11 @@ const OSForm = () => {
     const template = templates.find(t => t.id === templateId);
     if (template) {
       setSelectedTemplate(template);
-      // Preencher campos com conteúdo do modelo
+      // Preencher campos com conteúdo do modelo (apenas campos ativos)
       const newFormData = { ...formData };
       
       template.fields.forEach(field => {
-        if (field.content.trim() !== '' && field.id !== 'cpf' && field.id !== 'colaborador' && field.id !== 'funcao') {
+        if (field.active && field.content.trim() !== '' && field.id !== 'cpf' && field.id !== 'colaborador' && field.id !== 'funcao') {
           newFormData[field.id as keyof typeof newFormData] = field.content;
         }
       });
@@ -143,11 +164,31 @@ const OSForm = () => {
 
   const isFieldFromTemplate = (fieldId: string) => {
     if (!selectedTemplate) return false;
-    return selectedTemplate.fields.some(field => field.id === fieldId && field.content.trim() !== '');
+    const field = selectedTemplate.fields.find(f => f.id === fieldId);
+    return field ? field.active && field.content.trim() !== '' : false;
+  };
+
+  const shouldShowField = (fieldId: string) => {
+    if (!selectedTemplate) return true;
+    const field = selectedTemplate.fields.find(f => f.id === fieldId);
+    return field ? field.active : true;
   };
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+    
+    // Verificar novamente se há OS pendente antes de salvar
+    if (!isEditing) {
+      const pendingOS = checkPendingOS(formData.cpf);
+      if (pendingOS) {
+        toast({
+          title: "Não é possível criar a OS",
+          description: "Já existe uma OS pendente de assinatura para este CPF.",
+          variant: "destructive"
+        });
+        return;
+      }
+    }
     
     if (isEditing && id) {
       updateOS(id, formData);
@@ -302,80 +343,90 @@ const OSForm = () => {
                         />
                       </div>
 
-                      <div className="space-y-2">
-                        <Label htmlFor="obrigacoes">
-                          Obrigações do Colaborador
-                          {isFieldFromTemplate('obrigacoes') && <span className="text-sm text-gray-500 ml-2">(do modelo)</span>}
-                        </Label>
-                        <Textarea
-                          id="obrigacoes"
-                          value={formData.obrigacoes}
-                          onChange={(e) => handleInputChange("obrigacoes", e.target.value)}
-                          rows={4}
-                          disabled={isFieldFromTemplate('obrigacoes')}
-                          className={isFieldFromTemplate('obrigacoes') ? "bg-gray-100" : ""}
-                        />
-                      </div>
+                      {shouldShowField('obrigacoes') && (
+                        <div className="space-y-2">
+                          <Label htmlFor="obrigacoes">
+                            Obrigações do Colaborador
+                            {isFieldFromTemplate('obrigacoes') && <span className="text-sm text-gray-500 ml-2">(do modelo)</span>}
+                          </Label>
+                          <Textarea
+                            id="obrigacoes"
+                            value={formData.obrigacoes}
+                            onChange={(e) => handleInputChange("obrigacoes", e.target.value)}
+                            rows={4}
+                            disabled={isFieldFromTemplate('obrigacoes')}
+                            className={isFieldFromTemplate('obrigacoes') ? "bg-gray-100" : ""}
+                          />
+                        </div>
+                      )}
 
-                      <div className="space-y-2">
-                        <Label htmlFor="proibicoes">
-                          Proibições
-                          {isFieldFromTemplate('proibicoes') && <span className="text-sm text-gray-500 ml-2">(do modelo)</span>}
-                        </Label>
-                        <Textarea
-                          id="proibicoes"
-                          value={formData.proibicoes}
-                          onChange={(e) => handleInputChange("proibicoes", e.target.value)}
-                          rows={4}
-                          disabled={isFieldFromTemplate('proibicoes')}
-                          className={isFieldFromTemplate('proibicoes') ? "bg-gray-100" : ""}
-                        />
-                      </div>
+                      {shouldShowField('proibicoes') && (
+                        <div className="space-y-2">
+                          <Label htmlFor="proibicoes">
+                            Proibições
+                            {isFieldFromTemplate('proibicoes') && <span className="text-sm text-gray-500 ml-2">(do modelo)</span>}
+                          </Label>
+                          <Textarea
+                            id="proibicoes"
+                            value={formData.proibicoes}
+                            onChange={(e) => handleInputChange("proibicoes", e.target.value)}
+                            rows={4}
+                            disabled={isFieldFromTemplate('proibicoes')}
+                            className={isFieldFromTemplate('proibicoes') ? "bg-gray-100" : ""}
+                          />
+                        </div>
+                      )}
 
-                      <div className="space-y-2">
-                        <Label htmlFor="penalidades">
-                          Penalidades
-                          {isFieldFromTemplate('penalidades') && <span className="text-sm text-gray-500 ml-2">(do modelo)</span>}
-                        </Label>
-                        <Textarea
-                          id="penalidades"
-                          value={formData.penalidades}
-                          onChange={(e) => handleInputChange("penalidades", e.target.value)}
-                          rows={3}
-                          disabled={isFieldFromTemplate('penalidades')}
-                          className={isFieldFromTemplate('penalidades') ? "bg-gray-100" : ""}
-                        />
-                      </div>
+                      {shouldShowField('penalidades') && (
+                        <div className="space-y-2">
+                          <Label htmlFor="penalidades">
+                            Penalidades
+                            {isFieldFromTemplate('penalidades') && <span className="text-sm text-gray-500 ml-2">(do modelo)</span>}
+                          </Label>
+                          <Textarea
+                            id="penalidades"
+                            value={formData.penalidades}
+                            onChange={(e) => handleInputChange("penalidades", e.target.value)}
+                            rows={3}
+                            disabled={isFieldFromTemplate('penalidades')}
+                            className={isFieldFromTemplate('penalidades') ? "bg-gray-100" : ""}
+                          />
+                        </div>
+                      )}
 
-                      <div className="space-y-2">
-                        <Label htmlFor="termoRecebimento">
-                          Termo de Recebimento e Compromisso
-                          {isFieldFromTemplate('termoRecebimento') && <span className="text-sm text-gray-500 ml-2">(do modelo)</span>}
-                        </Label>
-                        <Textarea
-                          id="termoRecebimento"
-                          value={formData.termoRecebimento}
-                          onChange={(e) => handleInputChange("termoRecebimento", e.target.value)}
-                          rows={4}
-                          disabled={isFieldFromTemplate('termoRecebimento')}
-                          className={isFieldFromTemplate('termoRecebimento') ? "bg-gray-100" : ""}
-                        />
-                      </div>
+                      {shouldShowField('termoRecebimento') && (
+                        <div className="space-y-2">
+                          <Label htmlFor="termoRecebimento">
+                            Termo de Recebimento e Compromisso
+                            {isFieldFromTemplate('termoRecebimento') && <span className="text-sm text-gray-500 ml-2">(do modelo)</span>}
+                          </Label>
+                          <Textarea
+                            id="termoRecebimento"
+                            value={formData.termoRecebimento}
+                            onChange={(e) => handleInputChange("termoRecebimento", e.target.value)}
+                            rows={4}
+                            disabled={isFieldFromTemplate('termoRecebimento')}
+                            className={isFieldFromTemplate('termoRecebimento') ? "bg-gray-100" : ""}
+                          />
+                        </div>
+                      )}
 
-                      <div className="space-y-2">
-                        <Label htmlFor="procedimentosAcidente">
-                          Procedimentos em Caso de Acidente
-                          {isFieldFromTemplate('procedimentosAcidente') && <span className="text-sm text-gray-500 ml-2">(do modelo)</span>}
-                        </Label>
-                        <Textarea
-                          id="procedimentosAcidente"
-                          value={formData.procedimentosAcidente}
-                          onChange={(e) => handleInputChange("procedimentosAcidente", e.target.value)}
-                          rows={4}
-                          disabled={isFieldFromTemplate('procedimentosAcidente')}
-                          className={isFieldFromTemplate('procedimentosAcidente') ? "bg-gray-100" : ""}
-                        />
-                      </div>
+                      {shouldShowField('procedimentosAcidente') && (
+                        <div className="space-y-2">
+                          <Label htmlFor="procedimentosAcidente">
+                            Procedimentos em Caso de Acidente
+                            {isFieldFromTemplate('procedimentosAcidente') && <span className="text-sm text-gray-500 ml-2">(do modelo)</span>}
+                          </Label>
+                          <Textarea
+                            id="procedimentosAcidente"
+                            value={formData.procedimentosAcidente}
+                            onChange={(e) => handleInputChange("procedimentosAcidente", e.target.value)}
+                            rows={4}
+                            disabled={isFieldFromTemplate('procedimentosAcidente')}
+                            className={isFieldFromTemplate('procedimentosAcidente') ? "bg-gray-100" : ""}
+                          />
+                        </div>
+                      )}
                     </div>
 
                     <div className="flex justify-end space-x-4 pt-6">

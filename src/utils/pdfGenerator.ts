@@ -77,10 +77,16 @@ export const generateOSPDF = (os: OS) => {
           border: 2px solid #007bff;
           padding: 15px;
           margin: 20px auto;
-          width: 300px;
+          width: 400px;
           text-align: center;
           background-color: #f8f9fa;
           border-radius: 5px;
+        }
+        .signature-canvas {
+          border: 1px solid #ddd;
+          margin: 10px auto;
+          display: block;
+          background-color: white;
         }
         .signature-info {
           margin-top: 20px;
@@ -128,37 +134,51 @@ export const generateOSPDF = (os: OS) => {
         <div class="content">${os.epis}</div>
       </div>
 
-      <div class="section">
-        <div class="section-title">Obrigações do Colaborador</div>
-        <div class="content">${os.obrigacoes}</div>
-      </div>
+      ${os.obrigacoes ? `
+        <div class="section">
+          <div class="section-title">Obrigações do Colaborador</div>
+          <div class="content">${os.obrigacoes}</div>
+        </div>
+      ` : ''}
 
-      <div class="section">
-        <div class="section-title">Proibições</div>
-        <div class="content">${os.proibicoes}</div>
-      </div>
+      ${os.proibicoes ? `
+        <div class="section">
+          <div class="section-title">Proibições</div>
+          <div class="content">${os.proibicoes}</div>
+        </div>
+      ` : ''}
 
-      <div class="section">
-        <div class="section-title">Penalidades</div>
-        <div class="content">${os.penalidades}</div>
-      </div>
+      ${os.penalidades ? `
+        <div class="section">
+          <div class="section-title">Penalidades</div>
+          <div class="content">${os.penalidades}</div>
+        </div>
+      ` : ''}
 
-      <div class="section">
-        <div class="section-title">Termo de Recebimento e Compromisso</div>
-        <div class="content">${os.termoRecebimento}</div>
-      </div>
+      ${os.termoRecebimento ? `
+        <div class="section">
+          <div class="section-title">Termo de Recebimento e Compromisso</div>
+          <div class="content">${os.termoRecebimento}</div>
+        </div>
+      ` : ''}
 
-      <div class="section">
-        <div class="section-title">Procedimentos em Caso de Acidente</div>
-        <div class="content">${os.procedimentosAcidente}</div>
-      </div>
+      ${os.procedimentosAcidente ? `
+        <div class="section">
+          <div class="section-title">Procedimentos em Caso de Acidente</div>
+          <div class="content">${os.procedimentosAcidente}</div>
+        </div>
+      ` : ''}
 
       <div class="signature-section">
         ${os.status === 'assinada' && os.assinatura ? `
           <div class="digital-signature">
             <div style="font-size: 18px; margin-bottom: 10px;">✓ DOCUMENTO ASSINADO DIGITALMENTE</div>
-            <div style="font-size: 14px; margin-bottom: 5px;">Assinatura: <strong>${os.assinatura}</strong></div>
-            <div style="font-size: 12px;">Data: ${os.dataAssinatura ? new Date(os.dataAssinatura).toLocaleDateString('pt-BR') : ''}</div>
+            <div style="font-size: 14px; margin-bottom: 5px;">Assinado por: <strong>${os.colaborador}</strong></div>
+            <div style="font-size: 12px; margin-bottom: 10px;">Data: ${os.dataAssinatura ? new Date(os.dataAssinatura).toLocaleDateString('pt-BR') : ''}</div>
+            <div style="border: 1px solid #ccc; padding: 10px; background-color: white; margin: 10px 0;">
+              <strong>Assinatura Digital:</strong><br>
+              <span style="font-family: cursive; font-size: 20px; color: #0066cc;">${os.assinatura}</span>
+            </div>
           </div>
           <div class="signature-info">
             Este documento foi assinado digitalmente em ${os.dataAssinatura ? new Date(os.dataAssinatura).toLocaleDateString('pt-BR') : ''}
