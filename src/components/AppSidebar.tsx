@@ -1,5 +1,5 @@
 
-import { Home, Search, Plus, Settings, LogOut } from "lucide-react";
+import { Home, Search, Plus, Settings, LogOut, Building2 } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
 import {
   Sidebar,
@@ -10,6 +10,7 @@ import {
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
+  SidebarHeader,
 } from "@/components/ui/sidebar";
 
 const menuItems = [
@@ -44,6 +45,17 @@ export function AppSidebar() {
 
   return (
     <Sidebar collapsible="icon">
+      <SidebarHeader>
+        <div className="flex items-center gap-2 px-4 py-2">
+          <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary text-primary-foreground">
+            <Building2 className="h-4 w-4" />
+          </div>
+          <div className="group-data-[collapsible=icon]:hidden">
+            <p className="text-xs text-sidebar-foreground/70">Sistema OS</p>
+            <p className="text-xs font-semibold text-sidebar-foreground">Admin</p>
+          </div>
+        </div>
+      </SidebarHeader>
       <SidebarContent>
         <SidebarGroup>
           <SidebarGroupLabel>Menu</SidebarGroupLabel>

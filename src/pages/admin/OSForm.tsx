@@ -14,18 +14,17 @@ import { useOSConfig, OSTemplate } from "@/contexts/OSConfigContext";
 import { SidebarProvider, SidebarTrigger, SidebarInset } from "@/components/ui/sidebar";
 import { AppSidebar } from "@/components/AppSidebar";
 
-const filiais = ["Rio Centro", "Barra da Tijuca", "Ipanema"];
-
 const OSForm = () => {
   const navigate = useNavigate();
   const { id } = useParams();
   const [searchParams] = useSearchParams();
   const cpfFromUrl = searchParams.get('cpf');
   const { addOS, updateOS, getOSById, getOSByCPF, getCollaboratorByCPF } = useOS();
-  const { templates } = useOSConfig();
+  const { templates, getFiliais } = useOSConfig();
   const isEditing = !!id;
 
   const [selectedTemplate, setSelectedTemplate] = useState<OSTemplate | null>(null);
+  const [isDataFromExistingSource, setIsDataFromExistingSource] = useState(false);
   const [formData, setFormData] = useState({
     filial: "",
     colaborador: "",
@@ -54,8 +53,10 @@ const OSForm = () => {
         setFormData(prev => ({
           ...prev,
           colaborador: osExistente.colaborador,
-          funcao: osExistente.funcao
+          funcao: osExistente.funcao,
+          filial: osExistente.filial
         }));
+        setIsDataFromExistingSource(true);
       } else {
         // 2. Se não existe OS, busca na base de colaboradores
         console.log('Nenhuma OS encontrada, buscando na base de colaboradores');
@@ -66,16 +67,20 @@ const OSForm = () => {
           setFormData(prev => ({
             ...prev,
             colaborador: colaborador.nome,
-            funcao: colaborador.funcao
+            funcao: colaborador.funcao,
+            filial: colaborador.filial || ""
           }));
+          setIsDataFromExistingSource(true);
         } else {
           // 3. Se não encontra nem OS nem colaborador, deixa campos vazios
           console.log('CPF não localizado, deixando campos vazios');
           setFormData(prev => ({
             ...prev,
             colaborador: "",
-            funcao: ""
+            funcao: "",
+            filial: ""
           }));
+          setIsDataFromExistingSource(false);
         }
       }
     }
@@ -201,12 +206,16 @@ const OSForm = () => {
                     <div className="grid md:grid-cols-2 gap-4">
                       <div className="space-y-2">
                         <Label htmlFor="filial">Filial *</Label>
-                        <Select value={formData.filial} onValueChange={(value) => handleInputChange("filial", value)}>
+                        <Select 
+                          value={formData.filial} 
+                          onValueChange={(value) => handleInputChange("filial", value)}
+                          disabled={isDataFromExistingSource}
+                        >
                           <SelectTrigger>
                             <SelectValue placeholder="Selecione a filial" />
                           </SelectTrigger>
                           <SelectContent>
-                            {filiais.map((filial) => (
+                            {getFiliais().map((filial) => (
                               <SelectItem key={filial} value={filial}>
                                 {filial}
                               </SelectItem>
@@ -235,6 +244,7 @@ const OSForm = () => {
                           onChange={(e) => handleInputChange("colaborador", e.target.value)}
                           placeholder="Nome completo do colaborador"
                           required
+                          disabled={isDataFromExistingSource}
                         />
                       </div>
                       <div className="space-y-2">
@@ -257,6 +267,7 @@ const OSForm = () => {
                           onChange={(e) => handleInputChange("funcao", e.target.value)}
                           placeholder="Função do colaborador"
                           required
+                          disabled={isDataFromExistingSource}
                         />
                       </div>
                     </div>
