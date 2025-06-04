@@ -1,4 +1,3 @@
-
 import { useParams, Link } from "react-router-dom";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -10,10 +9,10 @@ import { useOSConfig } from "@/contexts/OSConfigContext";
 const OSView = () => {
   const { id } = useParams();
   const { getOSById } = useOS();
-  const { getTemplateByEmpresa } = useOSConfig();
+  const { getTemplateByFilial } = useOSConfig();
   
   const osData = id ? getOSById(id) : undefined;
-  const template = osData ? getTemplateByEmpresa(osData.filial) : undefined;
+  const template = osData ? getTemplateByFilial(osData.filial) : undefined;
 
   if (!osData) {
     return (
