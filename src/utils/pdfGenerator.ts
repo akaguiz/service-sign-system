@@ -87,6 +87,8 @@ export const generateOSPDF = (os: OS) => {
           margin: 10px auto;
           display: block;
           background-color: white;
+          max-width: 300px;
+          height: auto;
         }
         .signature-info {
           margin-top: 20px;
@@ -175,9 +177,17 @@ export const generateOSPDF = (os: OS) => {
             <div style="font-size: 18px; margin-bottom: 10px;">✓ DOCUMENTO ASSINADO DIGITALMENTE</div>
             <div style="font-size: 14px; margin-bottom: 5px;">Assinado por: <strong>${os.colaborador}</strong></div>
             <div style="font-size: 12px; margin-bottom: 10px;">Data: ${os.dataAssinatura ? new Date(os.dataAssinatura).toLocaleDateString('pt-BR') : ''}</div>
+            
+            ${os.assinaturaCanvas ? `
+              <div style="margin: 15px 0;">
+                <strong>Assinatura:</strong><br>
+                <img src="${os.assinaturaCanvas}" class="signature-canvas" alt="Assinatura do colaborador" />
+              </div>
+            ` : ''}
+            
             <div style="border: 1px solid #ccc; padding: 10px; background-color: white; margin: 10px 0;">
-              <strong>Assinatura Digital:</strong><br>
-              <span style="font-family: cursive; font-size: 20px; color: #0066cc;">${os.assinatura}</span>
+              <strong>Hash da Assinatura:</strong><br>
+              <span style="font-family: monospace; font-size: 12px; color: #666; word-break: break-all;">${os.assinatura}</span>
             </div>
           </div>
           <div class="signature-info">

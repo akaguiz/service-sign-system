@@ -2,7 +2,6 @@ import React, { createContext, useContext, useState, ReactNode } from 'react';
 
 export interface OS {
   id: string;
-  numero: string; // Adicionar numeração de 4 dígitos
   filial: string;
   colaborador: string;
   cpf: string;
@@ -18,102 +17,111 @@ export interface OS {
   status: 'pendente' | 'assinada';
   assinatura?: string;
   dataAssinatura?: string;
+  assinaturaCanvas?: string;
+}
+
+export interface Collaborator {
+  nome: string;
+  cpf: string;
+  funcao: string;
+  filial?: string;
 }
 
 interface OSContextType {
   osList: OS[];
-  addOS: (os: Omit<OS, 'id' | 'status' | 'numero'>) => void;
-  updateOS: (id: string, os: Partial<OS>) => void;
+  addOS: (osData: Omit<OS, 'id' | 'status'>) => void;
+  updateOS: (id: string, updates: Partial<OS>) => void;
   deleteOS: (id: string) => void;
   getOSById: (id: string) => OS | undefined;
   getOSByCPF: (cpf: string) => OS | undefined;
-  searchOS: (colaborador: string, cpf: string) => OS[];
-  getCollaboratorByCPF: (cpf: string) => { nome: string; funcao: string; filial?: string } | undefined;
+  getCollaboratorByCPF: (cpf: string) => Collaborator | undefined;
 }
 
 const OSContext = createContext<OSContextType | undefined>(undefined);
 
-// Base expandida de colaboradores
-const colaboradores = [
-  { cpf: '123.456.789-00', nome: 'João Silva', funcao: 'Técnico de Segurança', filial: 'Rio Centro' },
-  { cpf: '987.654.321-00', nome: 'Maria Santos', funcao: 'Operadora de Máquinas', filial: 'Barra da Tijuca' },
-  { cpf: '111.222.333-44', nome: 'Pedro Oliveira', funcao: 'Soldador', filial: 'Copacabana' },
-  { cpf: '555.666.777-88', nome: 'Ana Costa', funcao: 'Técnica em Eletrônica', filial: 'Ipanema' },
-  { cpf: '999.888.777-66', nome: 'Carlos Mendes', funcao: 'Operador de Empilhadeira', filial: 'Tijuca' },
-  { cpf: '222.333.444-55', nome: 'Lucia Ferreira', funcao: 'Auxiliar de Produção', filial: 'Vila Isabel' },
-  { cpf: '444.555.666-77', nome: 'Roberto Alves', funcao: 'Mecânico Industrial', filial: 'Méier' },
-  { cpf: '666.777.888-99', nome: 'Fernanda Lima', funcao: 'Técnica de Qualidade', filial: 'Campo Grande' },
-  { cpf: '333.444.555-66', nome: 'José Rodrigues', funcao: 'Eletricista', filial: 'Rio Centro' },
-  { cpf: '777.888.999-00', nome: 'Patricia Sousa', funcao: 'Supervisora de Produção', filial: 'Barra da Tijuca' }
+const initialOSList: OS[] = [
+  {
+    id: '1',
+    filial: 'Rio Centro',
+    colaborador: 'João da Silva',
+    cpf: '123.456.789-00',
+    funcao: 'Auxiliar Administrativo',
+    riscos: 'Ergonômicos, Queda',
+    epis: 'Bota, Luva',
+    obrigacoes: 'Cumprir normas',
+    proibicoes: 'Fumar',
+    penalidades: 'Advertência',
+    termoRecebimento: 'Recebi os EPIs',
+    procedimentosAcidente: 'Comunicar o superior',
+    dataEmissao: '2024-01-20',
+    status: 'assinada',
+    assinatura: 'hash-assinatura-joao',
+    dataAssinatura: '2024-01-21',
+    assinaturaCanvas: 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAUAAAAFCAYAAACNbyblAAAAHElEQVQI12P4//8/w+n9UAAAAAAA//8ACPYwVAQAAAABJRU5ErkJggg=='
+  },
+  {
+    id: '2',
+    filial: 'Barra da Tijuca',
+    colaborador: 'Maria Souza',
+    cpf: '987.654.321-00',
+    funcao: 'Técnica de Enfermagem',
+    riscos: 'Biológicos, Químicos',
+    epis: 'Máscara, Luva',
+    obrigacoes: 'Seguir protocolos',
+    proibicoes: 'Remover EPIs',
+    penalidades: 'Suspensão',
+    termoRecebimento: 'Estou ciente dos riscos',
+    procedimentosAcidente: 'Lavar com água e sabão',
+    dataEmissao: '2024-02-15',
+    status: 'pendente'
+  },
+  {
+    id: '3',
+    filial: 'Copacabana',
+    colaborador: 'Carlos Pereira',
+    cpf: '456.789.123-00',
+    funcao: 'Analista de Sistemas',
+    riscos: 'Ergonômicos, Visuais',
+    epis: 'Óculos, Suporte',
+    obrigacoes: 'Manter postura',
+    proibicoes: 'Forçar a visão',
+    penalidades: 'Multa',
+    termoRecebimento: 'Instruído sobre os riscos',
+    procedimentosAcidente: 'Descansar a vista',
+    dataEmissao: '2024-03-10',
+    status: 'pendente'
+  }
+];
+
+const initialCollaborators: Collaborator[] = [
+  { nome: 'João da Silva', cpf: '123.456.789-00', funcao: 'Auxiliar Administrativo', filial: 'Rio Centro' },
+  { nome: 'Maria Souza', cpf: '987.654.321-00', funcao: 'Técnica de Enfermagem', filial: 'Barra da Tijuca' },
+  { nome: 'Carlos Pereira', cpf: '456.789.123-00', funcao: 'Analista de Sistemas', filial: 'Copacabana' },
+  { nome: 'Ana Paula', cpf: '654.321.987-00', funcao: 'Gerente de Projetos', filial: 'Ipanema' },
+  { nome: 'Pedro Alves', cpf: '321.654.987-00', funcao: 'Consultor Financeiro', filial: 'Tijuca' }
 ];
 
 export const OSProvider = ({ children }: { children: ReactNode }) => {
-  const [osList, setOSList] = useState<OS[]>([
-    {
-      id: '1',
-      numero: '0001',
-      filial: 'Rio Centro',
-      colaborador: 'João Silva',
-      cpf: '123.456.789-00',
-      funcao: 'Técnico de Segurança',
-      riscos: 'Trabalho em altura, exposição a ruído, manuseio de equipamentos',
-      epis: 'Capacete, óculos de proteção, luvas, calçado de segurança, protetor auricular',
-      obrigacoes: 'Utilizar EPIs obrigatórios, seguir procedimentos de segurança, reportar incidentes',
-      proibicoes: 'Não utilizar equipamentos sem treinamento, não remover proteções de segurança',
-      penalidades: 'Advertência verbal, advertência escrita, suspensão, demissão por justa causa',
-      termoRecebimento: 'Declaro ter recebido e compreendido todas as orientações de segurança',
-      procedimentosAcidente: 'Comunicar imediatamente o supervisor, buscar atendimento médico se necessário',
-      dataEmissao: '2024-05-30',
-      status: 'pendente'
-    },
-    {
-      id: '2',
-      numero: '0002',
-      filial: 'Barra da Tijuca',
-      colaborador: 'Maria Santos',
-      cpf: '987.654.321-00',
-      funcao: 'Operadora de Máquinas',
-      riscos: 'Operação de equipamentos pesados, ruído industrial',
-      epis: 'Capacete, protetor auricular, luvas de segurança, calçado de segurança',
-      obrigacoes: 'Seguir procedimentos operacionais, manter equipamentos limpos',
-      proibicoes: 'Não operar equipamentos sob efeito de substâncias, não burlar proteções',
-      penalidades: 'Advertência, suspensão, demissão por justa causa conforme gravidade',
-      termoRecebimento: 'Confirmo o recebimento e entendimento das normas de segurança',
-      procedimentosAcidente: 'Parar atividades, comunicar supervisor, procurar atendimento médico',
-      dataEmissao: '2024-05-29',
-      status: 'assinada',
-      assinatura: 'Maria Santos',
-      dataAssinatura: '2024-05-29'
-    }
-  ]);
+  const [osList, setOsList] = useState<OS[]>(initialOSList);
+  const [collaborators] = useState<Collaborator[]>(initialCollaborators);
 
-  const generateOSNumber = () => {
-    const maxNumber = osList.reduce((max, os) => {
-      const num = parseInt(os.numero);
-      return num > max ? num : max;
-    }, 0);
-    return (maxNumber + 1).toString().padStart(4, '0');
-  };
-
-  const addOS = (osData: Omit<OS, 'id' | 'status' | 'numero'>) => {
+  const addOS = (osData: Omit<OS, 'id' | 'status'>) => {
     const newOS: OS = {
       ...osData,
       id: Date.now().toString(),
-      numero: generateOSNumber(),
       status: 'pendente'
     };
-    console.log('Adicionando nova OS:', newOS);
-    setOSList(prev => [...prev, newOS]);
+    setOsList(prev => [...prev, newOS]);
   };
 
   const updateOS = (id: string, updates: Partial<OS>) => {
-    setOSList(prev => prev.map(os => 
+    setOsList(prev => prev.map(os => 
       os.id === id ? { ...os, ...updates } : os
     ));
   };
 
   const deleteOS = (id: string) => {
-    setOSList(prev => prev.filter(os => os.id !== id));
+    setOsList(prev => prev.filter(os => os.id !== id));
   };
 
   const getOSById = (id: string) => {
@@ -121,42 +129,33 @@ export const OSProvider = ({ children }: { children: ReactNode }) => {
   };
 
   const getOSByCPF = (cpf: string) => {
+    const cleanInputCPF = cpf.replace(/\D/g, '');
     console.log('Buscando OS para CPF:', cpf);
     console.log('Lista de OSs disponíveis:', osList.map(os => ({ id: os.id, cpf: os.cpf, colaborador: os.colaborador })));
     
-    // Normalizar CPF removendo formatação
-    const normalizedSearchCPF = cpf.replace(/\D/g, '');
-    
     const foundOS = osList.find(os => {
       const normalizedOSCPF = os.cpf.replace(/\D/g, '');
-      console.log(`Comparando: ${normalizedSearchCPF} com ${normalizedOSCPF}`);
-      return normalizedOSCPF === normalizedSearchCPF;
+      console.log('Comparando:', cleanInputCPF, 'com', normalizedOSCPF);
+      return normalizedOSCPF === cleanInputCPF;
     });
-
+    
     console.log('OS encontrada:', foundOS);
     return foundOS;
   };
 
   const getCollaboratorByCPF = (cpf: string) => {
+    const cleanInputCPF = cpf.replace(/\D/g, '');
     console.log('Buscando colaborador para CPF:', cpf);
-    console.log('Lista de colaboradores disponíveis:', colaboradores.map(col => ({ cpf: col.cpf, nome: col.nome, funcao: col.funcao, filial: col.filial })));
+    console.log('Lista de colaboradores disponíveis:', collaborators.map(c => ({ cpf: c.cpf, nome: c.nome, funcao: c.funcao, filial: c.filial })));
     
-    const normalizedSearchCPF = cpf.replace(/\D/g, '');
-    const foundCollaborator = colaboradores.find(col => {
-      const normalizedColCPF = col.cpf.replace(/\D/g, '');
-      console.log(`Comparando colaborador: ${normalizedSearchCPF} com ${normalizedColCPF}`);
-      return normalizedColCPF === normalizedSearchCPF;
+    const foundCollaborator = collaborators.find(collaborator => {
+      const normalizedCollaboratorCPF = collaborator.cpf.replace(/\D/g, '');
+      console.log('Comparando colaborador:', cleanInputCPF, 'com', normalizedCollaboratorCPF);
+      return normalizedCollaboratorCPF === cleanInputCPF;
     });
     
     console.log('Colaborador encontrado:', foundCollaborator);
     return foundCollaborator;
-  };
-
-  const searchOS = (colaborador: string, cpf: string) => {
-    return osList.filter(os => 
-      os.colaborador.toLowerCase().includes(colaborador.toLowerCase()) &&
-      os.cpf.includes(cpf)
-    );
   };
 
   return (
@@ -167,7 +166,6 @@ export const OSProvider = ({ children }: { children: ReactNode }) => {
       deleteOS,
       getOSById,
       getOSByCPF,
-      searchOS,
       getCollaboratorByCPF
     }}>
       {children}
