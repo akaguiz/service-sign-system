@@ -1,7 +1,9 @@
+
 import React, { createContext, useContext, useState, ReactNode } from 'react';
 
 export interface OS {
   id: string;
+  numero: string; // Adding the numero property
   filial: string;
   colaborador: string;
   cpf: string;
@@ -42,6 +44,7 @@ const OSContext = createContext<OSContextType | undefined>(undefined);
 const initialOSList: OS[] = [
   {
     id: '1',
+    numero: 'OS-001',
     filial: 'Rio Centro',
     colaborador: 'João da Silva',
     cpf: '123.456.789-00',
@@ -61,6 +64,7 @@ const initialOSList: OS[] = [
   },
   {
     id: '2',
+    numero: 'OS-002',
     filial: 'Barra da Tijuca',
     colaborador: 'Maria Souza',
     cpf: '987.654.321-00',
@@ -77,6 +81,7 @@ const initialOSList: OS[] = [
   },
   {
     id: '3',
+    numero: 'OS-003',
     filial: 'Copacabana',
     colaborador: 'Carlos Pereira',
     cpf: '456.789.123-00',
@@ -105,10 +110,12 @@ export const OSProvider = ({ children }: { children: ReactNode }) => {
   const [osList, setOsList] = useState<OS[]>(initialOSList);
   const [collaborators] = useState<Collaborator[]>(initialCollaborators);
 
-  const addOS = (osData: Omit<OS, 'id' | 'status'>) => {
+  const addOS = (osData: Omit<OS, 'id' | 'status' | 'numero'>) => {
+    const newOSNumber = `OS-${String(osList.length + 1).padStart(3, '0')}`;
     const newOS: OS = {
       ...osData,
       id: Date.now().toString(),
+      numero: newOSNumber,
       status: 'pendente'
     };
     setOsList(prev => [...prev, newOS]);
