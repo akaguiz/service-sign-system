@@ -26,6 +26,11 @@ export const generateOSPDF = (os: OS) => {
           font-weight: bold;
           margin-bottom: 10px;
         }
+        .os-number {
+          font-size: 18px;
+          color: #666;
+          margin-bottom: 10px;
+        }
         .info-grid {
           display: grid;
           grid-template-columns: 1fr 1fr;
@@ -104,6 +109,7 @@ export const generateOSPDF = (os: OS) => {
     <body>
       <div class="header">
         <div class="title">ORDEM DE SERVIÇO</div>
+        <div class="os-number">Nº ${os.numero}</div>
         <div>${os.filial}</div>
       </div>
 
@@ -172,22 +178,15 @@ export const generateOSPDF = (os: OS) => {
       ` : ''}
 
       <div class="signature-section">
-        ${os.status === 'assinada' && os.assinatura ? `
+        ${os.status === 'assinada' && os.assinaturaCanvas ? `
           <div class="digital-signature">
             <div style="font-size: 18px; margin-bottom: 10px;">✓ DOCUMENTO ASSINADO DIGITALMENTE</div>
             <div style="font-size: 14px; margin-bottom: 5px;">Assinado por: <strong>${os.colaborador}</strong></div>
             <div style="font-size: 12px; margin-bottom: 10px;">Data: ${os.dataAssinatura ? new Date(os.dataAssinatura).toLocaleDateString('pt-BR') : ''}</div>
             
-            ${os.assinaturaCanvas ? `
-              <div style="margin: 15px 0;">
-                <strong>Assinatura:</strong><br>
-                <img src="${os.assinaturaCanvas}" class="signature-canvas" alt="Assinatura do colaborador" />
-              </div>
-            ` : ''}
-            
-            <div style="border: 1px solid #ccc; padding: 10px; background-color: white; margin: 10px 0;">
-              <strong>Hash da Assinatura:</strong><br>
-              <span style="font-family: monospace; font-size: 12px; color: #666; word-break: break-all;">${os.assinatura}</span>
+            <div style="margin: 15px 0;">
+              <strong>Assinatura:</strong><br>
+              <img src="${os.assinaturaCanvas}" class="signature-canvas" alt="Assinatura do colaborador" />
             </div>
           </div>
           <div class="signature-info">

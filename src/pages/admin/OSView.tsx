@@ -1,3 +1,4 @@
+
 import { useParams, Link } from "react-router-dom";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -5,6 +6,7 @@ import { Badge } from "@/components/ui/badge";
 import { ArrowLeft, FileText, User, Calendar, CheckCircle, Clock } from "lucide-react";
 import { useOS } from "@/contexts/OSContext";
 import { useOSConfig } from "@/contexts/OSConfigContext";
+import { generateOSPDF } from "@/utils/pdfGenerator";
 
 const OSView = () => {
   const { id } = useParams();
@@ -69,17 +71,27 @@ const OSView = () => {
     );
   };
 
+  const handlePrint = () => {
+    generateOSPDF(osData);
+  };
+
   return (
     <div className="min-h-screen bg-gray-50 w-full">
       {/* Header */}
       <header className="bg-primary shadow-sm">
-        <div className="container mx-auto px-4 py-4 flex items-center">
-          <Link to="/admin/os" className="mr-4">
-            <Button variant="outline" size="sm" className="text-primary border-white hover:bg-white">
-              <ArrowLeft className="w-4 h-4" />
-            </Button>
-          </Link>
-          <h1 className="text-2xl font-bold text-white">Visualizar Ordem de Serviço</h1>
+        <div className="container mx-auto px-4 py-4 flex items-center justify-between">
+          <div className="flex items-center">
+            <Link to="/admin/os" className="mr-4">
+              <Button variant="outline" size="sm" className="text-primary border-white hover:bg-white">
+                <ArrowLeft className="w-4 h-4" />
+              </Button>
+            </Link>
+            <h1 className="text-2xl font-bold text-white">Visualizar Ordem de Serviço</h1>
+          </div>
+          <Button onClick={handlePrint} variant="outline" size="sm" className="text-primary border-white hover:bg-white">
+            <FileText className="w-4 h-4 mr-2" />
+            Gerar PDF
+          </Button>
         </div>
       </header>
 
@@ -93,8 +105,8 @@ const OSView = () => {
                 <CardTitle>OS #{osData.numero} - {osData.filial}</CardTitle>
               </div>
               <Badge 
-                variant={osData.status === "assinada" ? "default" : "secondary"}
-                className={`${osData.status === "assinada" ? "bg-green-600" : "bg-yellow-600"} text-white`}
+                variant={osData.status === "assinada" ? "default" : "warning"}
+                className={osData.status === "assinada" ? "bg-green-600 text-white" : ""}
               >
                 {osData.status === "assinada" ? (
                   <>
@@ -121,8 +133,18 @@ const OSView = () => {
               <div className="mt-4 p-3 bg-green-50 rounded-lg">
                 <p className="text-sm text-green-800">
                   <CheckCircle className="w-4 h-4 inline mr-1" />
-                  Assinada em {new Date(osData.dataAssinatura).toLocaleDateString('pt-BR')} por {osData.assinatura}
+                  Assinada em {new Date(osData.dataAssinatura).toLocaleDateString('pt-BR')} por {osData.colaborador}
                 </p>
+                {osData.assinaturaCanvas && (
+                  <div className="mt-3">
+                    <p className="text-sm text-green-700 mb-2">Assinatura:</p>
+                    <img 
+                      src={osData.assinaturaCanvas} 
+                      alt="Assinatura do colaborador" 
+                      className="border border-green-200 rounded bg-white max-w-xs h-auto"
+                    />
+                  </div>
+                )}
               </div>
             )}
           </CardContent>
