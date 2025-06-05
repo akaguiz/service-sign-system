@@ -31,7 +31,7 @@ export interface Collaborator {
 
 interface OSContextType {
   osList: OS[];
-  addOS: (osData: Omit<OS, 'id' | 'status'>) => void;
+  addOS: (osData: Omit<OS, 'id' | 'status' | 'numero'>) => void;
   updateOS: (id: string, updates: Partial<OS>) => void;
   deleteOS: (id: string) => void;
   getOSById: (id: string) => OS | undefined;
