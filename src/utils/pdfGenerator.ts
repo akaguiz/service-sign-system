@@ -187,16 +187,20 @@ export const generateOSPDF = (os: OS) => {
         ${os.status === 'assinada' && os.assinaturaCanvas ? `
           <div class="digital-signature">
             <div style="font-size: 18px; margin-bottom: 10px; color: #28a745;">✓ DOCUMENTO ASSINADO DIGITALMENTE</div>
-            <div style="font-size: 14px; margin-bottom: 5px;">Assinado por: <strong>${os.colaborador}</strong></div>
-            <div style="font-size: 12px; margin-bottom: 15px;">Data: ${os.dataAssinatura ? new Date(os.dataAssinatura).toLocaleDateString('pt-BR') : ''}</div>
+            
+            <div style="margin: 20px 0; text-align: left;">
+              <div style="font-size: 16px; margin-bottom: 8px;"><strong>Colaborador:</strong> ${os.colaborador}</div>
+              <div style="font-size: 16px; margin-bottom: 8px;"><strong>Status:</strong> Assinado Digitalmente</div>
+              <div style="font-size: 16px; margin-bottom: 15px;"><strong>Data da Assinatura:</strong> ${os.dataAssinatura ? new Date(os.dataAssinatura).toLocaleDateString('pt-BR') : ''}</div>
+            </div>
             
             <div style="margin: 15px 0;">
-              <strong style="display: block; margin-bottom: 10px;">Assinatura Digital:</strong>
+              <strong style="display: block; margin-bottom: 10px; font-size: 16px;">Assinatura Digital:</strong>
               <img src="${os.assinaturaCanvas}" class="signature-canvas" alt="Assinatura do colaborador" style="border: 1px solid #ddd; padding: 5px; background: white;" />
             </div>
           </div>
           <div class="signature-info">
-            Este documento foi assinado digitalmente em ${os.dataAssinatura ? new Date(os.dataAssinatura).toLocaleDateString('pt-BR') : ''}
+            Este documento foi assinado digitalmente em ${os.dataAssinatura ? new Date(os.dataAssinatura).toLocaleDateString('pt-BR') : ''} por ${os.colaborador}
           </div>
         ` : `
           <div class="signature-line">

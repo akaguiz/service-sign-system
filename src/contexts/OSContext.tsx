@@ -1,4 +1,3 @@
-
 import React, { createContext, useContext, useState, ReactNode } from 'react';
 
 export interface OS {
@@ -103,7 +102,17 @@ const initialCollaborators: Collaborator[] = [
   { nome: 'Maria Souza', cpf: '987.654.321-00', funcao: 'Técnica de Enfermagem', filial: 'Barra da Tijuca' },
   { nome: 'Carlos Pereira', cpf: '456.789.123-00', funcao: 'Analista de Sistemas', filial: 'Copacabana' },
   { nome: 'Ana Paula', cpf: '654.321.987-00', funcao: 'Gerente de Projetos', filial: 'Ipanema' },
-  { nome: 'Pedro Alves', cpf: '321.654.987-00', funcao: 'Consultor Financeiro', filial: 'Tijuca' }
+  { nome: 'Pedro Alves', cpf: '321.654.987-00', funcao: 'Consultor Financeiro', filial: 'Tijuca' },
+  { nome: 'João Silva', cpf: '123.456.789-00', funcao: 'Técnico de Segurança', filial: 'Rio Centro' },
+  { nome: 'Maria Santos', cpf: '987.654.321-00', funcao: 'Operadora de Máquinas', filial: 'Barra da Tijuca' },
+  { nome: 'Pedro Oliveira', cpf: '111.222.333-44', funcao: 'Soldador', filial: 'Copacabana' },
+  { nome: 'Ana Costa', cpf: '555.666.777-88', funcao: 'Técnica em Eletrônica', filial: 'Ipanema' },
+  { nome: 'Carlos Mendes', cpf: '999.888.777-66', funcao: 'Operador de Empilhadeira', filial: 'Tijuca' },
+  { nome: 'Lucia Ferreira', cpf: '222.333.444-55', funcao: 'Auxiliar de Produção', filial: 'Rio Centro' },
+  { nome: 'Roberto Alves', cpf: '444.555.666-77', funcao: 'Mecânico Industrial', filial: 'Barra da Tijuca' },
+  { nome: 'Fernanda Lima', cpf: '666.777.888-99', funcao: 'Técnica de Qualidade', filial: 'Copacabana' },
+  { nome: 'José Rodrigues', cpf: '333.444.555-66', funcao: 'Eletricista', filial: 'Ipanema' },
+  { nome: 'Patricia Sousa', cpf: '777.888.999-00', funcao: 'Supervisora de Produção', filial: 'Tijuca' }
 ];
 
 export const OSProvider = ({ children }: { children: ReactNode }) => {
