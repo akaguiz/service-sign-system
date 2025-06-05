@@ -93,6 +93,8 @@ export const generateOSPDF = (os: OS) => {
           display: block;
           background-color: white;
           max-width: 300px;
+          max-height: 120px;
+          width: auto;
           height: auto;
         }
         .signature-info {
@@ -103,13 +105,17 @@ export const generateOSPDF = (os: OS) => {
         }
         @media print {
           body { margin: 0; }
+          .signature-canvas {
+            -webkit-print-color-adjust: exact;
+            color-adjust: exact;
+          }
         }
       </style>
     </head>
     <body>
       <div class="header">
         <div class="title">ORDEM DE SERVIÇO</div>
-        <div class="os-number">Nº ${os.numero}</div>
+        <div class="os-number">Nº ${os.numero || `OS-${String(parseInt(os.id) || 0).padStart(3, '0')}`}</div>
         <div>${os.filial}</div>
       </div>
 
@@ -180,13 +186,13 @@ export const generateOSPDF = (os: OS) => {
       <div class="signature-section">
         ${os.status === 'assinada' && os.assinaturaCanvas ? `
           <div class="digital-signature">
-            <div style="font-size: 18px; margin-bottom: 10px;">✓ DOCUMENTO ASSINADO DIGITALMENTE</div>
+            <div style="font-size: 18px; margin-bottom: 10px; color: #28a745;">✓ DOCUMENTO ASSINADO DIGITALMENTE</div>
             <div style="font-size: 14px; margin-bottom: 5px;">Assinado por: <strong>${os.colaborador}</strong></div>
-            <div style="font-size: 12px; margin-bottom: 10px;">Data: ${os.dataAssinatura ? new Date(os.dataAssinatura).toLocaleDateString('pt-BR') : ''}</div>
+            <div style="font-size: 12px; margin-bottom: 15px;">Data: ${os.dataAssinatura ? new Date(os.dataAssinatura).toLocaleDateString('pt-BR') : ''}</div>
             
             <div style="margin: 15px 0;">
-              <strong>Assinatura:</strong><br>
-              <img src="${os.assinaturaCanvas}" class="signature-canvas" alt="Assinatura do colaborador" />
+              <strong style="display: block; margin-bottom: 10px;">Assinatura Digital:</strong>
+              <img src="${os.assinaturaCanvas}" class="signature-canvas" alt="Assinatura do colaborador" style="border: 1px solid #ddd; padding: 5px; background: white;" />
             </div>
           </div>
           <div class="signature-info">
@@ -209,10 +215,13 @@ export const generateOSPDF = (os: OS) => {
     printWindow.document.write(htmlContent);
     printWindow.document.close();
     
-    // Aguardar carregamento e imprimir
+    // Aguardar carregamento completo das imagens antes de imprimir
     printWindow.onload = () => {
-      printWindow.print();
-      printWindow.close();
+      // Pequeno delay para garantir que as imagens sejam carregadas
+      setTimeout(() => {
+        printWindow.print();
+        printWindow.close();
+      }, 500);
     };
   }
 };
