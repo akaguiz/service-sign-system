@@ -146,7 +146,7 @@ const OSList = () => {
                       <tbody>
                         {filteredOS.map((os) => (
                           <tr key={os.id} className="border-b hover:bg-gray-50">
-                            <td className="py-3 px-4 font-mono">{os.numero}</td>
+                            <td className="py-3 px-4 font-mono">{os.numero || `OS-${String(parseInt(os.id) || 0).padStart(3, '0')}`}</td>
                             <td className="py-3 px-4">{os.colaborador}</td>
                             <td className="py-3 px-4">{os.funcao}</td>
                             <td className="py-3 px-4">{os.cpf}</td>

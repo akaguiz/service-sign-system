@@ -102,7 +102,7 @@ const OSView = () => {
             <div className="flex justify-between items-start">
               <div className="flex items-center">
                 <FileText className="w-6 h-6 mr-2 text-primary" />
-                <CardTitle>OS #{osData.numero} - {osData.filial}</CardTitle>
+                <CardTitle>OS #{osData.numero || `OS-${String(parseInt(osData.id) || 0).padStart(3, '0')}`} - {osData.filial}</CardTitle>
               </div>
               <Badge 
                 variant={osData.status === "assinada" ? "default" : "warning"}
@@ -138,11 +138,14 @@ const OSView = () => {
                 {osData.assinaturaCanvas && (
                   <div className="mt-3">
                     <p className="text-sm text-green-700 mb-2">Assinatura:</p>
-                    <img 
-                      src={osData.assinaturaCanvas} 
-                      alt="Assinatura do colaborador" 
-                      className="border border-green-200 rounded bg-white max-w-xs h-auto"
-                    />
+                    <div className="border border-green-200 rounded bg-white p-2 inline-block">
+                      <img 
+                        src={osData.assinaturaCanvas} 
+                        alt="Assinatura do colaborador" 
+                        className="max-w-xs h-auto block"
+                        style={{ maxHeight: '100px' }}
+                      />
+                    </div>
                   </div>
                 )}
               </div>
