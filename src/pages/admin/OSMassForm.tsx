@@ -20,12 +20,11 @@ const OSMassForm = () => {
   const [searchParams] = useSearchParams();
   const collaboratorsParam = searchParams.get('collaborators');
   const { addOS, getCollaboratorByCPF } = useOS();
-  const { templates, getFiliais } = useOSConfig();
+  const { templates } = useOSConfig();
 
   const [selectedTemplate, setSelectedTemplate] = useState<OSTemplate | null>(null);
   const [selectedCollaborators, setSelectedCollaborators] = useState<Collaborator[]>([]);
   const [formData, setFormData] = useState({
-    filial: "",
     riscos: "",
     epis: "",
     obrigacoes: "",
@@ -100,7 +99,7 @@ const OSMassForm = () => {
         colaborador: collaborator.nome,
         cpf: collaborator.cpf,
         funcao: collaborator.funcao,
-        filial: collaborator.filial || formData.filial
+        filial: collaborator.filial || ""
       };
       
       try {
@@ -142,24 +141,7 @@ const OSMassForm = () => {
                     <CardTitle>Informações da Ordem de Serviço em Massa</CardTitle>
                   </CardHeader>
                   <CardContent className="space-y-6">
-                    {/* Seletor de Modelo */}
-                    <div className="space-y-2">
-                      <Label htmlFor="template">Modelo de OS</Label>
-                      <Select value={selectedTemplate?.id || ""} onValueChange={handleTemplateSelect}>
-                        <SelectTrigger>
-                          <SelectValue placeholder="Selecione um modelo existente" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          {templates.map((template) => (
-                            <SelectItem key={template.id} value={template.id}>
-                              {template.nome}
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
-                    </div>
-
-                    {/* Colaboradores Selecionados */}
+                    {/* Colaboradores Selecionados - moved to first position */}
                     <div className="space-y-2">
                       <Label>Colaboradores Selecionados ({selectedCollaborators.length})</Label>
                       <div className="flex flex-wrap gap-2 p-4 border rounded-lg bg-gray-50 min-h-[100px]">
@@ -183,36 +165,34 @@ const OSMassForm = () => {
                       </div>
                     </div>
 
-                    {/* Dados básicos */}
-                    <div className="grid md:grid-cols-2 gap-4">
-                      <div className="space-y-2">
-                        <Label htmlFor="filial">Filial *</Label>
-                        <Select 
-                          value={formData.filial} 
-                          onValueChange={(value) => handleInputChange("filial", value)}
-                        >
-                          <SelectTrigger>
-                            <SelectValue placeholder="Selecione a filial" />
-                          </SelectTrigger>
-                          <SelectContent>
-                            {getFiliais().map((filial) => (
-                              <SelectItem key={filial} value={filial}>
-                                {filial}
-                              </SelectItem>
-                            ))}
-                          </SelectContent>
-                        </Select>
-                      </div>
-                      <div className="space-y-2">
-                        <Label htmlFor="dataEmissao">Data de Emissão *</Label>
-                        <Input
-                          id="dataEmissao"
-                          type="date"
-                          value={formData.dataEmissao}
-                          onChange={(e) => handleInputChange("dataEmissao", e.target.value)}
-                          required
-                        />
-                      </div>
+                    {/* Seletor de Modelo - moved to second position */}
+                    <div className="space-y-2">
+                      <Label htmlFor="template">Modelo de OS</Label>
+                      <Select value={selectedTemplate?.id || ""} onValueChange={handleTemplateSelect}>
+                        <SelectTrigger>
+                          <SelectValue placeholder="Selecione um modelo existente" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {templates.map((template) => (
+                            <SelectItem key={template.id} value={template.id}>
+                              {template.nome}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </div>
+
+                    {/* Data de Emissão */}
+                    <div className="space-y-2">
+                      <Label htmlFor="dataEmissao">Data de Emissão *</Label>
+                      <Input
+                        id="dataEmissao"
+                        type="date"
+                        value={formData.dataEmissao}
+                        onChange={(e) => handleInputChange("dataEmissao", e.target.value)}
+                        required
+                        className="max-w-xs"
+                      />
                     </div>
 
                     {/* Campos de texto */}

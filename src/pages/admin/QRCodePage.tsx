@@ -122,27 +122,14 @@ const QRCodePage = () => {
             </header>
 
             <div className="container mx-auto px-4 py-8 max-w-2xl">
-              <Card className="mb-6">
-                <CardHeader>
-                  <CardTitle className="flex items-center">
-                    <QrCode className="w-5 h-5 mr-2 text-primary" />
-                    QR Code Único do Sistema
-                  </CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <div className="space-y-4">
-                    <Button onClick={generateUniqueQRCode} className="bg-primary hover:bg-primary-hover w-full">
-                      Gerar Novo QR Code
-                    </Button>
-                  </div>
-                </CardContent>
-              </Card>
-
               {qrCodeDataURL && (
                 <Card>
                   <CardHeader>
                     <div className="flex items-center justify-between">
-                      <CardTitle>QR Code Gerado</CardTitle>
+                      <CardTitle className="flex items-center">
+                        <QrCode className="w-5 h-5 mr-2 text-primary" />
+                        QR Code do Sistema
+                      </CardTitle>
                       <Button onClick={handlePrint} variant="outline">
                         <Printer className="w-4 h-4 mr-2" />
                         Imprimir

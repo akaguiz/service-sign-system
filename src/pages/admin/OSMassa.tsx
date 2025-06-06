@@ -41,14 +41,14 @@ const OSMassa = () => {
 
   const [searchCpf, setSearchCpf] = useState("");
   const [searchName, setSearchName] = useState("");
-  const [searchFuncao, setSearchFuncao] = useState("all");
+  const [searchFuncao, setSearchFuncao] = useState("");
   const [searchFilial, setSearchFilial] = useState("all");
   const [selectedCollaborators, setSelectedCollaborators] = useState<Collaborator[]>([]);
 
   const filteredCollaborators = allCollaborators.filter(collaborator => {
     const cpfMatch = searchCpf === "" || collaborator.cpf.includes(searchCpf);
     const nameMatch = searchName === "" || collaborator.nome.toLowerCase().includes(searchName.toLowerCase());
-    const funcaoMatch = searchFuncao === "all" || collaborator.funcao === searchFuncao;
+    const funcaoMatch = searchFuncao === "" || collaborator.funcao.toLowerCase().includes(searchFuncao.toLowerCase());
     const filialMatch = searchFilial === "all" || (collaborator.filial && collaborator.filial === searchFilial);
     
     return cpfMatch && nameMatch && funcaoMatch && filialMatch;
@@ -162,24 +162,14 @@ const OSMassa = () => {
                     <CardTitle>
                       Colaboradores ({filteredCollaborators.length}) - {selectedCollaborators.length} selecionados
                     </CardTitle>
-                    <div className="flex items-center space-x-4">
-                      <div className="flex items-center space-x-2">
-                        <Checkbox
-                          id="selectAll"
-                          checked={selectedCollaborators.length === filteredCollaborators.length && filteredCollaborators.length > 0}
-                          onCheckedChange={handleSelectAll}
-                        />
-                        <Label htmlFor="selectAll">Marcar/Desmarcar Todos</Label>
-                      </div>
-                      <Button 
-                        onClick={handleCreateMassOS}
-                        disabled={selectedCollaborators.length === 0}
-                        className="bg-primary hover:bg-primary-hover"
-                      >
-                        <Users className="w-4 h-4 mr-2" />
-                        Criar OS em Massa ({selectedCollaborators.length})
-                      </Button>
-                    </div>
+                    <Button 
+                      onClick={handleCreateMassOS}
+                      disabled={selectedCollaborators.length === 0}
+                      className="bg-primary hover:bg-primary-hover"
+                    >
+                      <Users className="w-4 h-4 mr-2" />
+                      Criar OS em Massa ({selectedCollaborators.length})
+                    </Button>
                   </div>
                 </CardHeader>
                 <CardContent>
@@ -190,7 +180,13 @@ const OSMassa = () => {
                           <th className="text-left py-3 px-4 font-semibold w-16">
                             <Checkbox
                               checked={selectedCollaborators.length === filteredCollaborators.length && filteredCollaborators.length > 0}
-                              onCheckedChange={handleSelectAll}
+                              onCheckedChange={(checked) => {
+                                if (checked) {
+                                  setSelectedCollaborators(filteredCollaborators);
+                                } else {
+                                  setSelectedCollaborators([]);
+                                }
+                              }}
                             />
                           </th>
                           <th className="text-left py-3 px-4 font-semibold">CPF</th>
