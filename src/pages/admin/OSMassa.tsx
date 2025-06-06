@@ -40,14 +40,14 @@ const OSMassa = () => {
 
   const [searchCpf, setSearchCpf] = useState("");
   const [searchName, setSearchName] = useState("");
-  const [searchFuncao, setSearchFuncao] = useState("");
+  const [searchFuncao, setSearchFuncao] = useState("all");
   const [searchFilial, setSearchFilial] = useState("");
   const [selectedCollaborators, setSelectedCollaborators] = useState<Collaborator[]>([]);
 
   const filteredCollaborators = allCollaborators.filter(collaborator => {
     const cpfMatch = searchCpf === "" || collaborator.cpf.includes(searchCpf);
     const nameMatch = searchName === "" || collaborator.nome.toLowerCase().includes(searchName.toLowerCase());
-    const funcaoMatch = searchFuncao === "" || collaborator.funcao === searchFuncao;
+    const funcaoMatch = searchFuncao === "all" || collaborator.funcao === searchFuncao;
     const filialMatch = searchFilial === "" || (collaborator.filial && collaborator.filial.toLowerCase().includes(searchFilial.toLowerCase()));
     
     return cpfMatch && nameMatch && funcaoMatch && filialMatch;
@@ -134,7 +134,7 @@ const OSMassa = () => {
                           <SelectValue placeholder="Selecione a função" />
                         </SelectTrigger>
                         <SelectContent>
-                          <SelectItem value="">Todas as funções</SelectItem>
+                          <SelectItem value="all">Todas as funções</SelectItem>
                           {uniqueFuncoes.map(funcao => (
                             <SelectItem key={funcao} value={funcao}>{funcao}</SelectItem>
                           ))}
