@@ -9,12 +9,14 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Search, Users, ChevronRight } from "lucide-react";
 import { useOS, Collaborator } from "@/contexts/OSContext";
+import { useOSConfig } from "@/contexts/OSConfigContext";
 import { SidebarProvider, SidebarTrigger, SidebarInset } from "@/components/ui/sidebar";
 import { AppSidebar } from "@/components/AppSidebar";
 
 const OSMassa = () => {
   const navigate = useNavigate();
   const { getCollaboratorByCPF } = useOS();
+  const { getFiliais } = useOSConfig();
   
   // Lista de colaboradores (usando a mesma do contexto)
   const allCollaborators: Collaborator[] = [
@@ -41,14 +43,14 @@ const OSMassa = () => {
   const [searchCpf, setSearchCpf] = useState("");
   const [searchName, setSearchName] = useState("");
   const [searchFuncao, setSearchFuncao] = useState("all");
-  const [searchFilial, setSearchFilial] = useState("");
+  const [searchFilial, setSearchFilial] = useState("all");
   const [selectedCollaborators, setSelectedCollaborators] = useState<Collaborator[]>([]);
 
   const filteredCollaborators = allCollaborators.filter(collaborator => {
     const cpfMatch = searchCpf === "" || collaborator.cpf.includes(searchCpf);
     const nameMatch = searchName === "" || collaborator.nome.toLowerCase().includes(searchName.toLowerCase());
     const funcaoMatch = searchFuncao === "all" || collaborator.funcao === searchFuncao;
-    const filialMatch = searchFilial === "" || (collaborator.filial && collaborator.filial.toLowerCase().includes(searchFilial.toLowerCase()));
+    const filialMatch = searchFilial === "all" || (collaborator.filial && collaborator.filial === searchFilial);
     
     return cpfMatch && nameMatch && funcaoMatch && filialMatch;
   });
@@ -143,12 +145,17 @@ const OSMassa = () => {
                     </div>
                     <div className="space-y-2">
                       <Label htmlFor="searchFilial">Filial</Label>
-                      <Input
-                        id="searchFilial"
-                        placeholder="Digite a filial"
-                        value={searchFilial}
-                        onChange={(e) => setSearchFilial(e.target.value)}
-                      />
+                      <Select value={searchFilial} onValueChange={setSearchFilial}>
+                        <SelectTrigger>
+                          <SelectValue placeholder="Selecione a filial" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="all">Todas as filiais</SelectItem>
+                          {getFiliais().map(filial => (
+                            <SelectItem key={filial} value={filial}>{filial}</SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
                     </div>
                   </div>
                 </CardContent>

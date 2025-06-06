@@ -30,9 +30,8 @@ const QRCodePage = () => {
       return;
     }
 
-    // Remove formatação do CPF para a URL
-    const cpfNumbers = cpf.replace(/\D/g, '');
-    const signatureUrl = generateSignatureQRCode(cpfNumbers);
+    // Usar o CPF formatado para a URL
+    const signatureUrl = generateSignatureQRCode(cpf);
     console.log('URL gerada para QR Code:', signatureUrl);
     const qrCode = await generateQRCodeDataURL(signatureUrl);
     setQrCodeDataURL(qrCode);
@@ -210,7 +209,7 @@ const QRCodePage = () => {
                           Escaneie este QR Code com seu smartphone para acessar o sistema de assinatura digital da Ordem de Serviço.
                         </p>
                         <p className="text-sm text-gray-500">
-                          Link: {generateSignatureQRCode(cpf.replace(/\D/g, ''))}
+                          Link: {generateSignatureQRCode(cpf)}
                         </p>
                       </div>
                     </div>
