@@ -2,38 +2,20 @@
 import { useState, useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import { Printer, QrCode } from "lucide-react";
 import { SidebarProvider, SidebarTrigger, SidebarInset } from "@/components/ui/sidebar";
 import { AppSidebar } from "@/components/AppSidebar";
-import { generateQRCodeDataURL, generateSignatureQRCode } from "@/utils/qrCodeGenerator";
+import { generateQRCodeDataURL } from "@/utils/qrCodeGenerator";
 
 const QRCodePage = () => {
-  const [cpf, setCpf] = useState("");
   const [qrCodeDataURL, setQrCodeDataURL] = useState("");
 
-  const formatCPF = (value: string) => {
-    const numbers = value.replace(/\D/g, '');
-    const formatted = numbers
-      .replace(/(\d{3})(\d)/, '$1.$2')
-      .replace(/(\d{3})(\d)/, '$1.$2')
-      .replace(/(\d{3})(\d{1,2})/, '$1-$2')
-      .replace(/(-\d{2})\d+?$/, '$1');
-    
-    setCpf(formatted);
-  };
-
-  const generateQRCode = async () => {
-    if (cpf.trim() === "") {
-      alert("Por favor, insira um CPF válido.");
-      return;
-    }
-
-    // Usar o CPF formatado para a URL
-    const signatureUrl = generateSignatureQRCode(cpf);
-    console.log('URL gerada para QR Code:', signatureUrl);
-    const qrCode = await generateQRCodeDataURL(signatureUrl);
+  const generateUniqueQRCode = async () => {
+    // Gerar QR Code único para o sistema de assinatura
+    const baseUrl = window.location.origin;
+    const uniqueUrl = `${baseUrl}/signature`;
+    console.log('URL gerada para QR Code único:', uniqueUrl);
+    const qrCode = await generateQRCodeDataURL(uniqueUrl);
     setQrCodeDataURL(qrCode);
   };
 
@@ -50,7 +32,7 @@ const QRCodePage = () => {
         <html>
         <head>
           <meta charset="utf-8">
-          <title>QR Code - Assinatura Digital</title>
+          <title>QR Code - Sistema de Assinatura Digital</title>
           <style>
             body {
               font-family: Arial, sans-serif;
@@ -83,12 +65,6 @@ const QRCodePage = () => {
               max-width: 400px;
               line-height: 1.5;
             }
-            .cpf-info {
-              font-size: 18px;
-              font-weight: bold;
-              color: #333;
-              margin: 15px 0;
-            }
             @media print {
               body { 
                 margin: 0; 
@@ -102,13 +78,12 @@ const QRCodePage = () => {
         </head>
         <body>
           <div class="qr-container">
-            <div class="title">QR Code - Assinatura Digital</div>
-            <div class="cpf-info">CPF: ${cpf}</div>
+            <div class="title">QR Code - Sistema de Assinatura Digital</div>
             <div class="qr-image">
-              <img src="${qrCodeDataURL}" alt="QR Code para Assinatura" style="width: 300px; height: 300px;" />
+              <img src="${qrCodeDataURL}" alt="QR Code para Sistema de Assinatura" style="width: 300px; height: 300px;" />
             </div>
             <div class="instructions">
-              Escaneie este QR Code com seu smartphone para acessar o sistema de assinatura digital da Ordem de Serviço.
+              Escaneie este QR Code com seu smartphone para acessar o sistema de assinatura digital das Ordens de Serviço.
             </div>
           </div>
         </body>
@@ -127,18 +102,10 @@ const QRCodePage = () => {
     }
   };
 
-  // Gerar QR Code automaticamente quando o componente carregar com um CPF padrão
+  // Gerar QR Code automaticamente quando o componente carregar
   useEffect(() => {
-    if (cpf === "") {
-      setCpf("123.456.789-00"); // CPF padrão para demonstração
-    }
+    generateUniqueQRCode();
   }, []);
-
-  useEffect(() => {
-    if (cpf.length === 14) { // CPF formatado completo
-      generateQRCode();
-    }
-  }, [cpf]);
 
   return (
     <SidebarProvider>
@@ -150,7 +117,7 @@ const QRCodePage = () => {
             <header className="bg-primary shadow-sm">
               <div className="container mx-auto px-4 py-4 flex items-center">
                 <SidebarTrigger className="mr-4 text-white hover:bg-white/10" />
-                <h1 className="text-2xl font-bold text-white">QR Code - Assinatura Digital</h1>
+                <h1 className="text-2xl font-bold text-white">QR Code - Sistema de Assinatura</h1>
               </div>
             </header>
 
@@ -159,26 +126,14 @@ const QRCodePage = () => {
                 <CardHeader>
                   <CardTitle className="flex items-center">
                     <QrCode className="w-5 h-5 mr-2 text-primary" />
-                    Gerar QR Code
+                    QR Code Único do Sistema
                   </CardTitle>
                 </CardHeader>
                 <CardContent>
                   <div className="space-y-4">
-                    <div className="space-y-2">
-                      <Label htmlFor="cpf">CPF do Colaborador</Label>
-                      <div className="flex space-x-2">
-                        <Input
-                          id="cpf"
-                          value={cpf}
-                          onChange={(e) => formatCPF(e.target.value)}
-                          placeholder="000.000.000-00"
-                          maxLength={14}
-                        />
-                        <Button onClick={generateQRCode} className="bg-primary hover:bg-primary-hover">
-                          Gerar QR Code
-                        </Button>
-                      </div>
-                    </div>
+                    <Button onClick={generateUniqueQRCode} className="bg-primary hover:bg-primary-hover w-full">
+                      Gerar Novo QR Code
+                    </Button>
                   </div>
                 </CardContent>
               </Card>
@@ -199,17 +154,16 @@ const QRCodePage = () => {
                       <div className="inline-block p-6 border-2 border-gray-300 rounded-lg bg-white">
                         <img 
                           src={qrCodeDataURL} 
-                          alt="QR Code para Assinatura" 
+                          alt="QR Code para Sistema de Assinatura" 
                           className="w-80 h-80 mx-auto"
                         />
                       </div>
                       <div className="space-y-2">
-                        <p className="text-lg font-semibold">CPF: {cpf}</p>
                         <p className="text-gray-600 max-w-md mx-auto">
-                          Escaneie este QR Code com seu smartphone para acessar o sistema de assinatura digital da Ordem de Serviço.
+                          QR Code único para acesso ao sistema de assinatura digital das Ordens de Serviço.
                         </p>
                         <p className="text-sm text-gray-500">
-                          Link: {generateSignatureQRCode(cpf)}
+                          Link: {window.location.origin}/signature
                         </p>
                       </div>
                     </div>

@@ -20,6 +20,6 @@ export const generateQRCodeDataURL = async (text: string): Promise<string> => {
 
 export const generateSignatureQRCode = (cpf: string): string => {
   const baseUrl = window.location.origin;
-  // Manter a formatação do CPF na URL para compatibilidade
+  // Garantir que a URL leve para a página de assinatura com o CPF
   return `${baseUrl}/signature/${encodeURIComponent(cpf)}`;
 };

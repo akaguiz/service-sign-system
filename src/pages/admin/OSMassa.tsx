@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -131,17 +130,12 @@ const OSMassa = () => {
                     </div>
                     <div className="space-y-2">
                       <Label htmlFor="searchFuncao">Função</Label>
-                      <Select value={searchFuncao} onValueChange={setSearchFuncao}>
-                        <SelectTrigger>
-                          <SelectValue placeholder="Selecione a função" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="all">Todas as funções</SelectItem>
-                          {uniqueFuncoes.map(funcao => (
-                            <SelectItem key={funcao} value={funcao}>{funcao}</SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
+                      <Input
+                        id="searchFuncao"
+                        placeholder="Digite a função"
+                        value={searchFuncao}
+                        onChange={(e) => setSearchFuncao(e.target.value)}
+                      />
                     </div>
                     <div className="space-y-2">
                       <Label htmlFor="searchFilial">Filial</Label>
@@ -193,7 +187,12 @@ const OSMassa = () => {
                     <table className="w-full">
                       <thead>
                         <tr className="border-b">
-                          <th className="text-left py-3 px-4 font-semibold">Seleção</th>
+                          <th className="text-left py-3 px-4 font-semibold w-16">
+                            <Checkbox
+                              checked={selectedCollaborators.length === filteredCollaborators.length && filteredCollaborators.length > 0}
+                              onCheckedChange={handleSelectAll}
+                            />
+                          </th>
                           <th className="text-left py-3 px-4 font-semibold">CPF</th>
                           <th className="text-left py-3 px-4 font-semibold">Nome</th>
                           <th className="text-left py-3 px-4 font-semibold">Função</th>
@@ -201,8 +200,8 @@ const OSMassa = () => {
                         </tr>
                       </thead>
                       <tbody>
-                        {filteredCollaborators.map((collaborator) => (
-                          <tr key={collaborator.cpf} className="border-b hover:bg-gray-50">
+                        {filteredCollaborators.map((collaborator, index) => (
+                          <tr key={collaborator.cpf} className={`border-b hover:bg-gray-100 ${index % 2 === 0 ? 'bg-white' : 'bg-gray-50'}`}>
                             <td className="py-3 px-4">
                               <Checkbox
                                 checked={isSelected(collaborator)}

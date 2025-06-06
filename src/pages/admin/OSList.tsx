@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -7,7 +6,8 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Search, Plus, Eye, Edit, Printer, Trash2, QrCode } from "lucide-react";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { Search, Plus, Eye, Edit, Printer, Trash2, QrCode, X } from "lucide-react";
 import { useOS } from "@/contexts/OSContext";
 import { SidebarProvider, SidebarTrigger, SidebarInset } from "@/components/ui/sidebar";
 import { AppSidebar } from "@/components/AppSidebar";
@@ -22,6 +22,9 @@ const OSList = () => {
   const [searchCpf, setSearchCpf] = useState("");
   const [searchFilial, setSearchFilial] = useState("all");
   const [searchStatus, setSearchStatus] = useState("all");
+  const [qrModalOpen, setQrModalOpen] = useState(false);
+  const [currentQRCode, setCurrentQRCode] = useState("");
+  const [currentOS, setCurrentOS] = useState<any>(null);
   const { osList, deleteOS } = useOS();
 
   const filteredOS = osList.filter(os => {
@@ -61,65 +64,9 @@ const OSList = () => {
     const qrCode = await generateQRCodeDataURL(signatureUrl);
     
     if (qrCode) {
-      // Abrir uma janela com o QR Code
-      const qrWindow = window.open('', '_blank', 'width=400,height=500');
-      if (qrWindow) {
-        const htmlContent = `
-          <!DOCTYPE html>
-          <html>
-          <head>
-            <meta charset="utf-8">
-            <title>QR Code - ${os.colaborador}</title>
-            <style>
-              body {
-                font-family: Arial, sans-serif;
-                margin: 20px;
-                text-align: center;
-                background: #f5f5f5;
-              }
-              .container {
-                background: white;
-                padding: 20px;
-                border-radius: 10px;
-                box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-                display: inline-block;
-              }
-              .title {
-                font-size: 18px;
-                font-weight: bold;
-                margin-bottom: 10px;
-                color: #333;
-              }
-              .info {
-                font-size: 14px;
-                color: #666;
-                margin: 10px 0;
-              }
-              .qr-image {
-                margin: 15px 0;
-              }
-            </style>
-          </head>
-          <body>
-            <div class="container">
-              <div class="title">QR Code para Assinatura</div>
-              <div class="info"><strong>OS:</strong> ${os.numero}</div>
-              <div class="info"><strong>Colaborador:</strong> ${os.colaborador}</div>
-              <div class="info"><strong>CPF:</strong> ${os.cpf}</div>
-              <div class="qr-image">
-                <img src="${qrCode}" alt="QR Code" style="width: 200px; height: 200px;" />
-              </div>
-              <div class="info" style="font-size: 12px;">
-                Escaneie para acessar a assinatura digital
-              </div>
-            </div>
-          </body>
-          </html>
-        `;
-        
-        qrWindow.document.write(htmlContent);
-        qrWindow.document.close();
-      }
+      setCurrentQRCode(qrCode);
+      setCurrentOS(os);
+      setQrModalOpen(true);
     }
   };
 
@@ -236,8 +183,8 @@ const OSList = () => {
                             <td className="py-3 px-4">{os.filial}</td>
                             <td className="py-3 px-4">
                               <Badge 
-                                variant={os.status === "assinada" ? "default" : "secondary"}
-                                className={os.status === "assinada" ? "bg-green-600" : "bg-yellow-600"}
+                                variant={os.status === "assinada" ? "default" : "warning"}
+                                className={os.status === "assinada" ? "bg-green-600" : ""}
                               >
                                 {os.status === "assinada" ? "Assinada" : "Pendente"}
                               </Badge>
@@ -295,6 +242,39 @@ const OSList = () => {
                   </div>
                 </CardContent>
               </Card>
+
+              {/* Modal do QR Code */}
+              <Dialog open={qrModalOpen} onOpenChange={setQrModalOpen}>
+                <DialogContent className="max-w-md">
+                  <DialogHeader>
+                    <DialogTitle className="text-center">QR Code para Assinatura</DialogTitle>
+                  </DialogHeader>
+                  <div className="text-center space-y-4 py-4">
+                    {currentOS && (
+                      <>
+                        <div className="space-y-2">
+                          <p className="font-semibold">OS: {currentOS.numero || `OS-${String(parseInt(currentOS.id) || 0).padStart(3, '0')}`}</p>
+                          <p><strong>Colaborador:</strong> {currentOS.colaborador}</p>
+                          <p><strong>CPF:</strong> {currentOS.cpf}</p>
+                        </div>
+                        {currentQRCode && (
+                          <div className="flex justify-center">
+                            <img src={currentQRCode} alt="QR Code" className="w-48 h-48" />
+                          </div>
+                        )}
+                        <p className="text-sm text-gray-600">
+                          Escaneie para acessar a assinatura digital
+                        </p>
+                      </>
+                    )}
+                  </div>
+                  <div className="flex justify-center">
+                    <Button onClick={() => setQrModalOpen(false)} variant="outline">
+                      Fechar
+                    </Button>
+                  </div>
+                </DialogContent>
+              </Dialog>
             </div>
           </div>
         </SidebarInset>
