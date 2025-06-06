@@ -153,7 +153,7 @@ const OSConfig = () => {
                   </CardHeader>
                   <CardContent className="space-y-6">
                     <div className="grid md:grid-cols-2 gap-4">
-                      <div className="space-y-2">
+                      {/* <div className="space-y-2">
                         <Label htmlFor="filial">Filial *</Label>
                         <Select 
                           value={formData.filial} 
@@ -170,7 +170,7 @@ const OSConfig = () => {
                             ))}
                           </SelectContent>
                         </Select>
-                      </div>
+                      </div> */}
                       <div className="space-y-2">
                         <Label htmlFor="nome">Nome do Modelo *</Label>
                         <Input

@@ -137,7 +137,7 @@ const OSMassa = () => {
                         onChange={(e) => setSearchFuncao(e.target.value)}
                       />
                     </div>
-                    <div className="space-y-2">
+                    {/* <div className="space-y-2">
                       <Label htmlFor="searchFilial">Filial</Label>
                       <Select value={searchFilial} onValueChange={setSearchFilial}>
                         <SelectTrigger>
@@ -150,7 +150,7 @@ const OSMassa = () => {
                           ))}
                         </SelectContent>
                       </Select>
-                    </div>
+                    </div> */}
                   </div>
                 </CardContent>
               </Card>
