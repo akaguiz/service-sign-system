@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Search, Users, ChevronRight } from "lucide-react";
 import { useOS, Collaborator } from "@/contexts/OSContext";
 import { SidebarProvider, SidebarTrigger, SidebarInset } from "@/components/ui/sidebar";
@@ -34,6 +35,9 @@ const OSMassa = () => {
     { nome: 'Patricia Sousa', cpf: '777.888.999-00', funcao: 'Supervisora de Produção', filial: 'Tijuca' }
   ];
 
+  // Lista única de funções para o dropdown
+  const uniqueFuncoes = [...new Set(allCollaborators.map(c => c.funcao))].sort();
+
   const [searchCpf, setSearchCpf] = useState("");
   const [searchName, setSearchName] = useState("");
   const [searchFuncao, setSearchFuncao] = useState("");
@@ -43,7 +47,7 @@ const OSMassa = () => {
   const filteredCollaborators = allCollaborators.filter(collaborator => {
     const cpfMatch = searchCpf === "" || collaborator.cpf.includes(searchCpf);
     const nameMatch = searchName === "" || collaborator.nome.toLowerCase().includes(searchName.toLowerCase());
-    const funcaoMatch = searchFuncao === "" || collaborator.funcao.toLowerCase().includes(searchFuncao.toLowerCase());
+    const funcaoMatch = searchFuncao === "" || collaborator.funcao === searchFuncao;
     const filialMatch = searchFilial === "" || (collaborator.filial && collaborator.filial.toLowerCase().includes(searchFilial.toLowerCase()));
     
     return cpfMatch && nameMatch && funcaoMatch && filialMatch;
@@ -125,12 +129,17 @@ const OSMassa = () => {
                     </div>
                     <div className="space-y-2">
                       <Label htmlFor="searchFuncao">Função</Label>
-                      <Input
-                        id="searchFuncao"
-                        placeholder="Digite a função"
-                        value={searchFuncao}
-                        onChange={(e) => setSearchFuncao(e.target.value)}
-                      />
+                      <Select value={searchFuncao} onValueChange={setSearchFuncao}>
+                        <SelectTrigger>
+                          <SelectValue placeholder="Selecione a função" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="">Todas as funções</SelectItem>
+                          {uniqueFuncoes.map(funcao => (
+                            <SelectItem key={funcao} value={funcao}>{funcao}</SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
                     </div>
                     <div className="space-y-2">
                       <Label htmlFor="searchFilial">Filial</Label>
