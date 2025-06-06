@@ -7,11 +7,12 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Search, Plus, Eye, Edit, Printer, Trash2 } from "lucide-react";
+import { Search, Plus, Eye, Edit, Printer, Trash2, QrCode } from "lucide-react";
 import { useOS } from "@/contexts/OSContext";
 import { SidebarProvider, SidebarTrigger, SidebarInset } from "@/components/ui/sidebar";
 import { AppSidebar } from "@/components/AppSidebar";
 import { generateOSPDF } from "@/utils/pdfGenerator";
+import { generateQRCodeDataURL, generateSignatureQRCode } from "@/utils/qrCodeGenerator";
 import { toast } from "@/hooks/use-toast";
 
 const filiais = ["Rio Centro", "Barra da Tijuca", "Ipanema"];
@@ -20,14 +21,16 @@ const OSList = () => {
   const [searchName, setSearchName] = useState("");
   const [searchCpf, setSearchCpf] = useState("");
   const [searchFilial, setSearchFilial] = useState("all");
+  const [searchStatus, setSearchStatus] = useState("all");
   const { osList, deleteOS } = useOS();
 
   const filteredOS = osList.filter(os => {
     const nameMatch = searchName === "" || os.colaborador.toLowerCase().includes(searchName.toLowerCase());
     const cpfMatch = searchCpf === "" || os.cpf.includes(searchCpf);
     const filialMatch = searchFilial === "all" || os.filial === searchFilial;
+    const statusMatch = searchStatus === "all" || os.status === searchStatus;
     
-    return nameMatch && cpfMatch && filialMatch;
+    return nameMatch && cpfMatch && filialMatch && statusMatch;
   });
 
   const handlePrint = (os: any) => {
@@ -50,6 +53,73 @@ const OSList = () => {
         title: "OS excluída",
         description: "A ordem de serviço foi excluída com sucesso."
       });
+    }
+  };
+
+  const handleShowQRCode = async (os: any) => {
+    const signatureUrl = generateSignatureQRCode(os.cpf);
+    const qrCode = await generateQRCodeDataURL(signatureUrl);
+    
+    if (qrCode) {
+      // Abrir uma janela com o QR Code
+      const qrWindow = window.open('', '_blank', 'width=400,height=500');
+      if (qrWindow) {
+        const htmlContent = `
+          <!DOCTYPE html>
+          <html>
+          <head>
+            <meta charset="utf-8">
+            <title>QR Code - ${os.colaborador}</title>
+            <style>
+              body {
+                font-family: Arial, sans-serif;
+                margin: 20px;
+                text-align: center;
+                background: #f5f5f5;
+              }
+              .container {
+                background: white;
+                padding: 20px;
+                border-radius: 10px;
+                box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+                display: inline-block;
+              }
+              .title {
+                font-size: 18px;
+                font-weight: bold;
+                margin-bottom: 10px;
+                color: #333;
+              }
+              .info {
+                font-size: 14px;
+                color: #666;
+                margin: 10px 0;
+              }
+              .qr-image {
+                margin: 15px 0;
+              }
+            </style>
+          </head>
+          <body>
+            <div class="container">
+              <div class="title">QR Code para Assinatura</div>
+              <div class="info"><strong>OS:</strong> ${os.numero}</div>
+              <div class="info"><strong>Colaborador:</strong> ${os.colaborador}</div>
+              <div class="info"><strong>CPF:</strong> ${os.cpf}</div>
+              <div class="qr-image">
+                <img src="${qrCode}" alt="QR Code" style="width: 200px; height: 200px;" />
+              </div>
+              <div class="info" style="font-size: 12px;">
+                Escaneie para acessar a assinatura digital
+              </div>
+            </div>
+          </body>
+          </html>
+        `;
+        
+        qrWindow.document.write(htmlContent);
+        qrWindow.document.close();
+      }
     }
   };
 
@@ -85,7 +155,7 @@ const OSList = () => {
                   </CardTitle>
                 </CardHeader>
                 <CardContent>
-                  <div className="grid md:grid-cols-3 gap-4">
+                  <div className="grid md:grid-cols-4 gap-4">
                     <div className="space-y-2">
                       <Label htmlFor="searchName">Nome do Colaborador</Label>
                       <Input
@@ -117,6 +187,19 @@ const OSList = () => {
                               {filial}
                             </SelectItem>
                           ))}
+                        </SelectContent>
+                      </Select>
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="searchStatus">Status</Label>
+                      <Select value={searchStatus} onValueChange={setSearchStatus}>
+                        <SelectTrigger>
+                          <SelectValue placeholder="Selecione o status" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="all">Todos os status</SelectItem>
+                          <SelectItem value="pendente">Pendente</SelectItem>
+                          <SelectItem value="assinada">Assinada</SelectItem>
                         </SelectContent>
                       </Select>
                     </div>
@@ -178,6 +261,14 @@ const OSList = () => {
                                   onClick={() => handlePrint(os)}
                                 >
                                   <Printer className="w-4 h-4" />
+                                </Button>
+                                <Button 
+                                  size="sm" 
+                                  variant="outline" 
+                                  title="QR Code"
+                                  onClick={() => handleShowQRCode(os)}
+                                >
+                                  <QrCode className="w-4 h-4" />
                                 </Button>
                                 {os.status === 'pendente' && (
                                   <Button 

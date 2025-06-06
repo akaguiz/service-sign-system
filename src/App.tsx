@@ -15,6 +15,9 @@ import OSForm from "@/pages/admin/OSForm";
 import OSView from "@/pages/admin/OSView";
 import OSConfig from "@/pages/admin/OSConfig";
 import CPFSearch from "@/pages/admin/CPFSearch";
+import OSMassa from "@/pages/admin/OSMassa";
+import OSMassForm from "@/pages/admin/OSMassForm";
+import QRCodePage from "@/pages/admin/QRCodePage";
 
 // Signature pages  
 import SignatureLogin from "@/pages/signature/SignatureLogin";
@@ -40,6 +43,9 @@ function App() {
               <Route path="/admin/os/edit/:id" element={<OSForm />} />
               <Route path="/admin/os/view/:id" element={<OSView />} />
               <Route path="/admin/os/config" element={<OSConfig />} />
+              <Route path="/admin/os-massa" element={<OSMassa />} />
+              <Route path="/admin/os/mass-form" element={<OSMassForm />} />
+              <Route path="/admin/qrcode" element={<QRCodePage />} />
               
               {/* Signature routes */}
               <Route path="/signature" element={<SignatureLogin />} />

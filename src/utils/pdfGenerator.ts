@@ -1,7 +1,12 @@
 
 import { OS } from '@/contexts/OSContext';
+import { generateQRCodeDataURL, generateSignatureQRCode } from './qrCodeGenerator';
 
-export const generateOSPDF = (os: OS) => {
+export const generateOSPDF = async (os: OS) => {
+  // Gerar QR Code para assinatura
+  const signatureUrl = generateSignatureQRCode(os.cpf);
+  const qrCodeDataURL = await generateQRCodeDataURL(signatureUrl);
+
   // Criar o conteúdo HTML para o PDF
   const htmlContent = `
     <!DOCTYPE html>
@@ -103,9 +108,30 @@ export const generateOSPDF = (os: OS) => {
           color: #28a745;
           font-weight: bold;
         }
+        .qr-section {
+          margin-top: 30px;
+          text-align: center;
+          border: 1px solid #ddd;
+          padding: 20px;
+          background-color: #f9f9f9;
+        }
+        .qr-title {
+          font-size: 16px;
+          font-weight: bold;
+          margin-bottom: 10px;
+          color: #333;
+        }
+        .qr-image {
+          margin: 10px 0;
+        }
+        .qr-instructions {
+          font-size: 12px;
+          color: #666;
+          margin-top: 10px;
+        }
         @media print {
           body { margin: 0; }
-          .signature-canvas {
+          .signature-canvas, .qr-image img {
             -webkit-print-color-adjust: exact;
             color-adjust: exact;
           }
@@ -180,6 +206,18 @@ export const generateOSPDF = (os: OS) => {
         <div class="section">
           <div class="section-title">Procedimentos em Caso de Acidente</div>
           <div class="content">${os.procedimentosAcidente}</div>
+        </div>
+      ` : ''}
+
+      ${qrCodeDataURL ? `
+        <div class="qr-section">
+          <div class="qr-title">QR Code para Assinatura Digital</div>
+          <div class="qr-image">
+            <img src="${qrCodeDataURL}" alt="QR Code para Assinatura" style="width: 150px; height: 150px;" />
+          </div>
+          <div class="qr-instructions">
+            Escaneie este QR Code com seu smartphone para acessar o sistema de assinatura digital
+          </div>
         </div>
       ` : ''}
 

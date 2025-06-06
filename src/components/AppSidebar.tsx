@@ -1,5 +1,5 @@
 
-import { Home, Search, Plus, Settings, LogOut } from "lucide-react";
+import { Home, Search, Plus, Settings, LogOut, Users, QrCode } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
 import {
   Sidebar,
@@ -28,6 +28,16 @@ const menuItems = [
     title: "Nova OS",
     url: "/admin/cpf-search",
     icon: Plus,
+  },
+  {
+    title: "OS em Massa",
+    url: "/admin/os-massa",
+    icon: Users,
+  },
+  {
+    title: "QR Code",
+    url: "/admin/qrcode",
+    icon: QrCode,
   },
   {
     title: "Modelos",
