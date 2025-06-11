@@ -15,7 +15,7 @@ const Index = () => {
               <Building className="w-8 h-8 text-white" />
             </div>
             <div>
-              <h1 className="text-xl font-bold text-gray-800">Sistema OS</h1>
+              <h1 className="text-xl font-bold text-gray-800">Sistema de OS</h1>
               <p className="text-sm text-gray-600">Gerenciador de Ordens de Serviço</p>
             </div>
           </div>
