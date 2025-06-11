@@ -230,25 +230,6 @@ const OSForm = () => {
                     <CardTitle>Informações da Ordem de Serviço</CardTitle>
                   </CardHeader>
                   <CardContent className="space-y-6">
-                    {/* Seletor de Modelo */}
-                    {!isEditing && (
-                      <div className="space-y-2">
-                        <Label htmlFor="template">Modelo de OS</Label>
-                        <Select value={selectedTemplate?.id || ""} onValueChange={handleTemplateSelect}>
-                          <SelectTrigger>
-                            <SelectValue placeholder="Selecione um modelo existente" />
-                          </SelectTrigger>
-                          <SelectContent>
-                            {templates.map((template) => (
-                              <SelectItem key={template.id} value={template.id}>
-                                {template.nome}
-                              </SelectItem>
-                            ))}
-                          </SelectContent>
-                        </Select>
-                      </div>
-                    )}
-
                     {/* Dados básicos */}
                     <div className="grid md:grid-cols-2 gap-4">
                       <div className="space-y-2">
@@ -318,6 +299,25 @@ const OSForm = () => {
                         />
                       </div>
                     </div>
+
+                    {/* Seletor de Modelo */}
+                    {!isEditing && (
+                      <div className="space-y-2">
+                        <Label htmlFor="template">Modelo de OS</Label>
+                        <Select value={selectedTemplate?.id || ""} onValueChange={handleTemplateSelect}>
+                          <SelectTrigger>
+                            <SelectValue placeholder="Selecione um modelo existente" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            {templates.map((template) => (
+                              <SelectItem key={template.id} value={template.id}>
+                                {template.nome}
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                      </div>
+                    )}
 
                     {/* Campos de texto */}
                     <div className="space-y-4">
