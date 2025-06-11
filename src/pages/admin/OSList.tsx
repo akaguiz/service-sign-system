@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -7,6 +8,7 @@ import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { Pagination, PaginationContent, PaginationItem, PaginationLink, PaginationNext, PaginationPrevious, PaginationEllipsis } from "@/components/ui/pagination";
 import { Search, Plus, Eye, Edit, Printer, Trash2, QrCode, X } from "lucide-react";
 import { useOS } from "@/contexts/OSContext";
 import { SidebarProvider, SidebarTrigger, SidebarInset } from "@/components/ui/sidebar";
@@ -25,7 +27,10 @@ const OSList = () => {
   const [qrModalOpen, setQrModalOpen] = useState(false);
   const [currentQRCode, setCurrentQRCode] = useState("");
   const [currentOS, setCurrentOS] = useState<any>(null);
+  const [currentPage, setCurrentPage] = useState(1);
   const { osList, deleteOS } = useOS();
+
+  const recordsPerPage = 10;
 
   const filteredOS = osList.filter(os => {
     const nameMatch = searchName === "" || os.colaborador.toLowerCase().includes(searchName.toLowerCase());
@@ -35,6 +40,19 @@ const OSList = () => {
     
     return nameMatch && cpfMatch && filialMatch && statusMatch;
   });
+
+  // Calcular total de páginas
+  const totalPages = Math.ceil(filteredOS.length / recordsPerPage);
+
+  // Obter registros da página atual
+  const startIndex = (currentPage - 1) * recordsPerPage;
+  const endIndex = startIndex + recordsPerPage;
+  const currentRecords = filteredOS.slice(startIndex, endIndex);
+
+  // Reset da página quando os filtros mudam
+  const handleFilterChange = () => {
+    setCurrentPage(1);
+  };
 
   const handlePrint = (os: any) => {
     generateOSPDF(os);
@@ -68,6 +86,93 @@ const OSList = () => {
       setCurrentOS(os);
       setQrModalOpen(true);
     }
+  };
+
+  const renderPaginationItems = () => {
+    const items = [];
+    const maxVisiblePages = 5;
+    
+    if (totalPages <= maxVisiblePages) {
+      for (let i = 1; i <= totalPages; i++) {
+        items.push(
+          <PaginationItem key={i}>
+            <PaginationLink
+              onClick={() => setCurrentPage(i)}
+              isActive={currentPage === i}
+              className="cursor-pointer"
+            >
+              {i}
+            </PaginationLink>
+          </PaginationItem>
+        );
+      }
+    } else {
+      // Primeira página
+      items.push(
+        <PaginationItem key={1}>
+          <PaginationLink
+            onClick={() => setCurrentPage(1)}
+            isActive={currentPage === 1}
+            className="cursor-pointer"
+          >
+            1
+          </PaginationLink>
+        </PaginationItem>
+      );
+
+      // Ellipsis se necessário
+      if (currentPage > 3) {
+        items.push(
+          <PaginationItem key="ellipsis1">
+            <PaginationEllipsis />
+          </PaginationItem>
+        );
+      }
+
+      // Páginas do meio
+      const start = Math.max(2, currentPage - 1);
+      const end = Math.min(totalPages - 1, currentPage + 1);
+      
+      for (let i = start; i <= end; i++) {
+        items.push(
+          <PaginationItem key={i}>
+            <PaginationLink
+              onClick={() => setCurrentPage(i)}
+              isActive={currentPage === i}
+              className="cursor-pointer"
+            >
+              {i}
+            </PaginationLink>
+          </PaginationItem>
+        );
+      }
+
+      // Ellipsis se necessário
+      if (currentPage < totalPages - 2) {
+        items.push(
+          <PaginationItem key="ellipsis2">
+            <PaginationEllipsis />
+          </PaginationItem>
+        );
+      }
+
+      // Última página
+      if (totalPages > 1) {
+        items.push(
+          <PaginationItem key={totalPages}>
+            <PaginationLink
+              onClick={() => setCurrentPage(totalPages)}
+              isActive={currentPage === totalPages}
+              className="cursor-pointer"
+            >
+              {totalPages}
+            </PaginationLink>
+          </PaginationItem>
+        );
+      }
+    }
+
+    return items;
   };
 
   return (
@@ -109,7 +214,10 @@ const OSList = () => {
                         id="searchName"
                         placeholder="Digite o nome do colaborador"
                         value={searchName}
-                        onChange={(e) => setSearchName(e.target.value)}
+                        onChange={(e) => {
+                          setSearchName(e.target.value);
+                          handleFilterChange();
+                        }}
                       />
                     </div>
                     <div className="space-y-2">
@@ -118,12 +226,18 @@ const OSList = () => {
                         id="searchCpf"
                         placeholder="Digite o CPF"
                         value={searchCpf}
-                        onChange={(e) => setSearchCpf(e.target.value)}
+                        onChange={(e) => {
+                          setSearchCpf(e.target.value);
+                          handleFilterChange();
+                        }}
                       />
                     </div>
                     <div className="space-y-2">
                       <Label htmlFor="searchFilial">Filial</Label>
-                      <Select value={searchFilial} onValueChange={setSearchFilial}>
+                      <Select value={searchFilial} onValueChange={(value) => {
+                        setSearchFilial(value);
+                        handleFilterChange();
+                      }}>
                         <SelectTrigger>
                           <SelectValue placeholder="Selecione a filial" />
                         </SelectTrigger>
@@ -139,7 +253,10 @@ const OSList = () => {
                     </div>
                     <div className="space-y-2">
                       <Label htmlFor="searchStatus">Status</Label>
-                      <Select value={searchStatus} onValueChange={setSearchStatus}>
+                      <Select value={searchStatus} onValueChange={(value) => {
+                        setSearchStatus(value);
+                        handleFilterChange();
+                      }}>
                         <SelectTrigger>
                           <SelectValue placeholder="Selecione o status" />
                         </SelectTrigger>
@@ -157,7 +274,14 @@ const OSList = () => {
               {/* Tabela de Resultados */}
               <Card>
                 <CardHeader>
-                  <CardTitle>Resultados ({filteredOS.length})</CardTitle>
+                  <div className="flex items-center justify-between">
+                    <CardTitle>
+                      Resultados ({filteredOS.length}) - Página {currentPage} de {totalPages}
+                    </CardTitle>
+                    <div className="text-sm text-gray-600">
+                      Exibindo {startIndex + 1} a {Math.min(endIndex, filteredOS.length)} de {filteredOS.length} registros
+                    </div>
+                  </div>
                 </CardHeader>
                 <CardContent>
                   <div className="overflow-x-auto">
@@ -174,7 +298,7 @@ const OSList = () => {
                         </tr>
                       </thead>
                       <tbody>
-                        {filteredOS.map((os) => (
+                        {currentRecords.map((os) => (
                           <tr key={os.id} className="border-b hover:bg-gray-50">
                             <td className="py-3 px-4 font-mono">{os.numero || `OS-${String(parseInt(os.id) || 0).padStart(3, '0')}`}</td>
                             <td className="py-3 px-4">{os.colaborador}</td>
@@ -234,12 +358,37 @@ const OSList = () => {
                         ))}
                       </tbody>
                     </table>
-                    {filteredOS.length === 0 && (
+                    {currentRecords.length === 0 && (
                       <div className="text-center py-8 text-gray-500">
                         Nenhuma OS encontrada com os filtros aplicados.
                       </div>
                     )}
                   </div>
+
+                  {/* Paginação */}
+                  {totalPages > 1 && (
+                    <div className="mt-6 flex justify-center">
+                      <Pagination>
+                        <PaginationContent>
+                          <PaginationItem>
+                            <PaginationPrevious 
+                              onClick={() => setCurrentPage(Math.max(1, currentPage - 1))}
+                              className={currentPage === 1 ? "pointer-events-none opacity-50" : "cursor-pointer"}
+                            />
+                          </PaginationItem>
+                          
+                          {renderPaginationItems()}
+                          
+                          <PaginationItem>
+                            <PaginationNext 
+                              onClick={() => setCurrentPage(Math.min(totalPages, currentPage + 1))}
+                              className={currentPage === totalPages ? "pointer-events-none opacity-50" : "cursor-pointer"}
+                            />
+                          </PaginationItem>
+                        </PaginationContent>
+                      </Pagination>
+                    </div>
+                  )}
                 </CardContent>
               </Card>
 
