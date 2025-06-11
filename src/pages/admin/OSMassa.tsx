@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -6,6 +7,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Pagination, PaginationContent, PaginationItem, PaginationLink, PaginationNext, PaginationPrevious, PaginationEllipsis } from "@/components/ui/pagination";
 import { Search, Users, ChevronRight } from "lucide-react";
 import { useOS, Collaborator } from "@/contexts/OSContext";
 import { useOSConfig } from "@/contexts/OSConfigContext";
@@ -44,6 +46,9 @@ const OSMassa = () => {
   const [searchFuncao, setSearchFuncao] = useState("");
   const [searchFilial, setSearchFilial] = useState("all");
   const [selectedCollaborators, setSelectedCollaborators] = useState<Collaborator[]>([]);
+  const [currentPage, setCurrentPage] = useState(1);
+
+  const recordsPerPage = 10;
 
   const filteredCollaborators = allCollaborators.filter(collaborator => {
     const cpfMatch = searchCpf === "" || collaborator.cpf.includes(searchCpf);
@@ -53,6 +58,19 @@ const OSMassa = () => {
     
     return cpfMatch && nameMatch && funcaoMatch && filialMatch;
   });
+
+  // Calcular total de páginas
+  const totalPages = Math.ceil(filteredCollaborators.length / recordsPerPage);
+
+  // Obter registros da página atual
+  const startIndex = (currentPage - 1) * recordsPerPage;
+  const endIndex = startIndex + recordsPerPage;
+  const currentRecords = filteredCollaborators.slice(startIndex, endIndex);
+
+  // Reset da página quando os filtros mudam
+  const handleFilterChange = () => {
+    setCurrentPage(1);
+  };
 
   const handleSelectCollaborator = (collaborator: Collaborator, checked: boolean) => {
     if (checked) {
@@ -64,9 +82,9 @@ const OSMassa = () => {
 
   const handleSelectAll = (checked: boolean) => {
     if (checked) {
-      setSelectedCollaborators(filteredCollaborators);
+      setSelectedCollaborators(currentRecords);
     } else {
-      setSelectedCollaborators([]);
+      setSelectedCollaborators(prev => prev.filter(c => !currentRecords.some(cr => cr.cpf === c.cpf)));
     }
   };
 
@@ -83,6 +101,93 @@ const OSMassa = () => {
     // Navegar para o formulário de OS em massa
     const cpfs = selectedCollaborators.map(c => c.cpf).join(',');
     navigate(`/admin/os/mass-form?collaborators=${encodeURIComponent(cpfs)}`);
+  };
+
+  const renderPaginationItems = () => {
+    const items = [];
+    const maxVisiblePages = 5;
+    
+    if (totalPages <= maxVisiblePages) {
+      for (let i = 1; i <= totalPages; i++) {
+        items.push(
+          <PaginationItem key={i}>
+            <PaginationLink
+              onClick={() => setCurrentPage(i)}
+              isActive={currentPage === i}
+              className="cursor-pointer"
+            >
+              {i}
+            </PaginationLink>
+          </PaginationItem>
+        );
+      }
+    } else {
+      // Primeira página
+      items.push(
+        <PaginationItem key={1}>
+          <PaginationLink
+            onClick={() => setCurrentPage(1)}
+            isActive={currentPage === 1}
+            className="cursor-pointer"
+          >
+            1
+          </PaginationLink>
+        </PaginationItem>
+      );
+
+      // Ellipsis se necessário
+      if (currentPage > 3) {
+        items.push(
+          <PaginationItem key="ellipsis1">
+            <PaginationEllipsis />
+          </PaginationItem>
+        );
+      }
+
+      // Páginas do meio
+      const start = Math.max(2, currentPage - 1);
+      const end = Math.min(totalPages - 1, currentPage + 1);
+      
+      for (let i = start; i <= end; i++) {
+        items.push(
+          <PaginationItem key={i}>
+            <PaginationLink
+              onClick={() => setCurrentPage(i)}
+              isActive={currentPage === i}
+              className="cursor-pointer"
+            >
+              {i}
+            </PaginationLink>
+          </PaginationItem>
+        );
+      }
+
+      // Ellipsis se necessário
+      if (currentPage < totalPages - 2) {
+        items.push(
+          <PaginationItem key="ellipsis2">
+            <PaginationEllipsis />
+          </PaginationItem>
+        );
+      }
+
+      // Última página
+      if (totalPages > 1) {
+        items.push(
+          <PaginationItem key={totalPages}>
+            <PaginationLink
+              onClick={() => setCurrentPage(totalPages)}
+              isActive={currentPage === totalPages}
+              className="cursor-pointer"
+            >
+              {totalPages}
+            </PaginationLink>
+          </PaginationItem>
+        );
+      }
+    }
+
+    return items;
   };
 
   return (
@@ -116,7 +221,10 @@ const OSMassa = () => {
                         id="searchCpf"
                         placeholder="Digite o CPF"
                         value={searchCpf}
-                        onChange={(e) => setSearchCpf(e.target.value)}
+                        onChange={(e) => {
+                          setSearchCpf(e.target.value);
+                          handleFilterChange();
+                        }}
                       />
                     </div>
                     <div className="space-y-2">
@@ -125,7 +233,10 @@ const OSMassa = () => {
                         id="searchName"
                         placeholder="Digite o nome"
                         value={searchName}
-                        onChange={(e) => setSearchName(e.target.value)}
+                        onChange={(e) => {
+                          setSearchName(e.target.value);
+                          handleFilterChange();
+                        }}
                       />
                     </div>
                     <div className="space-y-2">
@@ -134,7 +245,10 @@ const OSMassa = () => {
                         id="searchFuncao"
                         placeholder="Digite a função"
                         value={searchFuncao}
-                        onChange={(e) => setSearchFuncao(e.target.value)}
+                        onChange={(e) => {
+                          setSearchFuncao(e.target.value);
+                          handleFilterChange();
+                        }}
                       />
                     </div>
                     {/* <div className="space-y-2">
@@ -160,7 +274,7 @@ const OSMassa = () => {
                 <CardHeader>
                   <div className="flex items-center justify-between">
                     <CardTitle>
-                      Colaboradores ({filteredCollaborators.length}) - {selectedCollaborators.length} selecionados
+                      Colaboradores ({filteredCollaborators.length}) - {selectedCollaborators.length} selecionados - Página {currentPage} de {totalPages}
                     </CardTitle>
                     <Button 
                       onClick={handleCreateMassOS}
@@ -171,6 +285,9 @@ const OSMassa = () => {
                       Criar OS em Massa ({selectedCollaborators.length})
                     </Button>
                   </div>
+                  <div className="text-sm text-gray-600">
+                    Exibindo {startIndex + 1} a {Math.min(endIndex, filteredCollaborators.length)} de {filteredCollaborators.length} registros
+                  </div>
                 </CardHeader>
                 <CardContent>
                   <div className="overflow-x-auto">
@@ -179,14 +296,8 @@ const OSMassa = () => {
                         <tr className="border-b">
                           <th className="text-left py-3 px-4 font-semibold w-16">
                             <Checkbox
-                              checked={selectedCollaborators.length === filteredCollaborators.length && filteredCollaborators.length > 0}
-                              onCheckedChange={(checked) => {
-                                if (checked) {
-                                  setSelectedCollaborators(filteredCollaborators);
-                                } else {
-                                  setSelectedCollaborators([]);
-                                }
-                              }}
+                              checked={currentRecords.length > 0 && currentRecords.every(c => isSelected(c))}
+                              onCheckedChange={handleSelectAll}
                             />
                           </th>
                           <th className="text-left py-3 px-4 font-semibold">CPF</th>
@@ -196,7 +307,7 @@ const OSMassa = () => {
                         </tr>
                       </thead>
                       <tbody>
-                        {filteredCollaborators.map((collaborator, index) => (
+                        {currentRecords.map((collaborator, index) => (
                           <tr key={collaborator.cpf} className={`border-b hover:bg-gray-100 ${index % 2 === 0 ? 'bg-white' : 'bg-gray-50'}`}>
                             <td className="py-3 px-4">
                               <Checkbox
@@ -212,12 +323,37 @@ const OSMassa = () => {
                         ))}
                       </tbody>
                     </table>
-                    {filteredCollaborators.length === 0 && (
+                    {currentRecords.length === 0 && (
                       <div className="text-center py-8 text-gray-500">
                         Nenhum colaborador encontrado com os filtros aplicados.
                       </div>
                     )}
                   </div>
+
+                  {/* Paginação */}
+                  {totalPages > 1 && (
+                    <div className="mt-6 flex justify-center">
+                      <Pagination>
+                        <PaginationContent>
+                          <PaginationItem>
+                            <PaginationPrevious 
+                              onClick={() => setCurrentPage(Math.max(1, currentPage - 1))}
+                              className={currentPage === 1 ? "pointer-events-none opacity-50" : "cursor-pointer"}
+                            />
+                          </PaginationItem>
+                          
+                          {renderPaginationItems()}
+                          
+                          <PaginationItem>
+                            <PaginationNext 
+                              onClick={() => setCurrentPage(Math.min(totalPages, currentPage + 1))}
+                              className={currentPage === totalPages ? "pointer-events-none opacity-50" : "cursor-pointer"}
+                            />
+                          </PaginationItem>
+                        </PaginationContent>
+                      </Pagination>
+                    </div>
+                  )}
                 </CardContent>
               </Card>
             </div>
