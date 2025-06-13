@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -38,12 +37,11 @@ const OSMassa = () => {
     { nome: 'Patricia Sousa', cpf: '777.888.999-00', funcao: 'Supervisora de Produção', filial: 'Tijuca' }
   ];
 
-  // Lista única de funções para o dropdown
-  const uniqueFuncoes = [...new Set(allCollaborators.map(c => c.funcao))].sort();
+  // Lista única de filiais para o dropdown
+  const uniqueFiliais = [...new Set(allCollaborators.map(c => c.filial).filter(Boolean))].sort();
 
   const [searchCpf, setSearchCpf] = useState("");
   const [searchName, setSearchName] = useState("");
-  const [searchFuncao, setSearchFuncao] = useState("");
   const [searchFilial, setSearchFilial] = useState("all");
   const [selectedCollaborators, setSelectedCollaborators] = useState<Collaborator[]>([]);
   const [currentPage, setCurrentPage] = useState(1);
@@ -53,10 +51,9 @@ const OSMassa = () => {
   const filteredCollaborators = allCollaborators.filter(collaborator => {
     const cpfMatch = searchCpf === "" || collaborator.cpf.includes(searchCpf);
     const nameMatch = searchName === "" || collaborator.nome.toLowerCase().includes(searchName.toLowerCase());
-    const funcaoMatch = searchFuncao === "" || collaborator.funcao.toLowerCase().includes(searchFuncao.toLowerCase());
     const filialMatch = searchFilial === "all" || (collaborator.filial && collaborator.filial === searchFilial);
     
-    return cpfMatch && nameMatch && funcaoMatch && filialMatch;
+    return cpfMatch && nameMatch && filialMatch;
   });
 
   // Calcular total de páginas
@@ -214,7 +211,7 @@ const OSMassa = () => {
                   </CardTitle>
                 </CardHeader>
                 <CardContent>
-                  <div className="grid md:grid-cols-4 gap-4">
+                  <div className="grid md:grid-cols-3 gap-4">
                     <div className="space-y-2">
                       <Label htmlFor="searchCpf">CPF</Label>
                       <Input
@@ -240,31 +237,22 @@ const OSMassa = () => {
                       />
                     </div>
                     <div className="space-y-2">
-                      <Label htmlFor="searchFuncao">Função</Label>
-                      <Input
-                        id="searchFuncao"
-                        placeholder="Digite a função"
-                        value={searchFuncao}
-                        onChange={(e) => {
-                          setSearchFuncao(e.target.value);
-                          handleFilterChange();
-                        }}
-                      />
-                    </div>
-                    {/* <div className="space-y-2">
                       <Label htmlFor="searchFilial">Filial</Label>
-                      <Select value={searchFilial} onValueChange={setSearchFilial}>
+                      <Select value={searchFilial} onValueChange={(value) => {
+                        setSearchFilial(value);
+                        handleFilterChange();
+                      }}>
                         <SelectTrigger>
                           <SelectValue placeholder="Selecione a filial" />
                         </SelectTrigger>
                         <SelectContent>
                           <SelectItem value="all">Todas as filiais</SelectItem>
-                          {getFiliais().map(filial => (
+                          {uniqueFiliais.map(filial => (
                             <SelectItem key={filial} value={filial}>{filial}</SelectItem>
                           ))}
                         </SelectContent>
                       </Select>
-                    </div> */}
+                    </div>
                   </div>
                 </CardContent>
               </Card>

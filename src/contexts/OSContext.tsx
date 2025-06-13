@@ -1,3 +1,4 @@
+
 import React, { createContext, useContext, useState, ReactNode } from 'react';
 
 export interface OS {
@@ -19,6 +20,7 @@ export interface OS {
   assinatura?: string;
   dataAssinatura?: string;
   assinaturaCanvas?: string;
+  modelo?: string; // Adding modelo field
 }
 
 export interface Collaborator {
@@ -59,7 +61,8 @@ const initialOSList: OS[] = [
     status: 'assinada',
     assinatura: 'hash-assinatura-joao',
     dataAssinatura: '2024-01-21',
-    assinaturaCanvas: 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAUAAAAFCAYAAACNbyblAAAAHElEQVQI12P4//8/w+n9UAAAAAAA//8ACPYwVAQAAAABJRU5ErkJggg=='
+    assinaturaCanvas: 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAUAAAAFCAYAAACNbyblAAAAHElEQVQI12P4//8/w+n9UAAAAAAA//8ACPYwVAQAAAABJRU5ErkJggg==',
+    modelo: 'Modelo Padrão'
   },
   {
     id: '2',
@@ -76,7 +79,8 @@ const initialOSList: OS[] = [
     termoRecebimento: 'Estou ciente dos riscos',
     procedimentosAcidente: 'Lavar com água e sabão',
     dataEmissao: '2024-02-15',
-    status: 'pendente'
+    status: 'pendente',
+    modelo: 'Modelo Enfermagem'
   },
   {
     id: '3',
@@ -93,7 +97,8 @@ const initialOSList: OS[] = [
     termoRecebimento: 'Instruído sobre os riscos',
     procedimentosAcidente: 'Descansar a vista',
     dataEmissao: '2024-03-10',
-    status: 'pendente'
+    status: 'pendente',
+    modelo: 'Modelo TI'
   }
 ];
 

@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -24,6 +23,7 @@ const OSList = () => {
   const [searchCpf, setSearchCpf] = useState("");
   const [searchFilial, setSearchFilial] = useState("all");
   const [searchStatus, setSearchStatus] = useState("all");
+  const [searchModelo, setSearchModelo] = useState("all");
   const [qrModalOpen, setQrModalOpen] = useState(false);
   const [currentQRCode, setCurrentQRCode] = useState("");
   const [currentOS, setCurrentOS] = useState<any>(null);
@@ -32,13 +32,17 @@ const OSList = () => {
 
   const recordsPerPage = 10;
 
+  // Lista única de modelos para o filtro
+  const uniqueModelos = [...new Set(osList.map(os => os.modelo).filter(Boolean))].sort();
+
   const filteredOS = osList.filter(os => {
     const nameMatch = searchName === "" || os.colaborador.toLowerCase().includes(searchName.toLowerCase());
     const cpfMatch = searchCpf === "" || os.cpf.includes(searchCpf);
     const filialMatch = searchFilial === "all" || os.filial === searchFilial;
     const statusMatch = searchStatus === "all" || os.status === searchStatus;
+    const modeloMatch = searchModelo === "all" || os.modelo === searchModelo;
     
-    return nameMatch && cpfMatch && filialMatch && statusMatch;
+    return nameMatch && cpfMatch && filialMatch && statusMatch && modeloMatch;
   });
 
   // Calcular total de páginas
@@ -207,7 +211,7 @@ const OSList = () => {
                   </CardTitle>
                 </CardHeader>
                 <CardContent>
-                  <div className="grid md:grid-cols-4 gap-4">
+                  <div className="grid md:grid-cols-5 gap-4">
                     <div className="space-y-2">
                       <Label htmlFor="searchName">Nome do Colaborador</Label>
                       <Input
@@ -246,6 +250,25 @@ const OSList = () => {
                           {filiais.map((filial) => (
                             <SelectItem key={filial} value={filial}>
                               {filial}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="searchModelo">Modelo</Label>
+                      <Select value={searchModelo} onValueChange={(value) => {
+                        setSearchModelo(value);
+                        handleFilterChange();
+                      }}>
+                        <SelectTrigger>
+                          <SelectValue placeholder="Selecione o modelo" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="all">Todos os modelos</SelectItem>
+                          {uniqueModelos.map((modelo) => (
+                            <SelectItem key={modelo} value={modelo}>
+                              {modelo}
                             </SelectItem>
                           ))}
                         </SelectContent>
@@ -293,6 +316,7 @@ const OSList = () => {
                           <th className="text-left py-3 px-4 font-semibold">Função</th>
                           <th className="text-left py-3 px-4 font-semibold">CPF</th>
                           <th className="text-left py-3 px-4 font-semibold">Filial</th>
+                          <th className="text-left py-3 px-4 font-semibold">Modelo</th>
                           <th className="text-left py-3 px-4 font-semibold">Status</th>
                           <th className="text-left py-3 px-4 font-semibold">Ações</th>
                         </tr>
@@ -305,6 +329,7 @@ const OSList = () => {
                             <td className="py-3 px-4">{os.funcao}</td>
                             <td className="py-3 px-4">{os.cpf}</td>
                             <td className="py-3 px-4">{os.filial}</td>
+                            <td className="py-3 px-4">{os.modelo || '-'}</td>
                             <td className="py-3 px-4">
                               <Badge 
                                 variant={os.status === "assinada" ? "default" : "warning"}
