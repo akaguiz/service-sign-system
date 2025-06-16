@@ -127,6 +127,5 @@ npm start
 
 - Node.js  
 - Express  
-- [Adicionar banco de dados se houver]  
-- [Outras bibliotecas importantes]
+- TypeScript
 
