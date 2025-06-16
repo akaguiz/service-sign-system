@@ -1,73 +1,132 @@
-# Welcome to your Lovable project
+# Service Sign System
 
-## Project info
+## Descrição Geral
+API para gerenciamento e assinatura de documentos, permitindo criar, listar e assinar documentos eletronicamente.
 
-**URL**: https://lovable.dev/projects/ba2d72f5-85d0-4940-8798-b5a7b4bbf47d
+## Endpoints
 
-## How can I edit this code?
+### POST /documents  
+Cria um novo documento para assinatura.
 
-There are several ways of editing your application.
+- Request Body (JSON):
+```json
+{
+  "title": "string",
+  "content": "string",
+  "signers": [
+    {
+      "name": "string",
+      "email": "string"
+    }
+  ]
+}
+```
+- Response:
+  - 201 Created
+```json
+{
+  "id": "uuid",
+  "title": "string",
+  "content": "string",
+  "signers": [ ... ],
+  "status": "pending"
+}
+```
+- Erros:
+  - 400 Bad Request (dados inválidos)
 
-**Use Lovable**
+---
 
-Simply visit the [Lovable Project](https://lovable.dev/projects/ba2d72f5-85d0-4940-8798-b5a7b4bbf47d) and start prompting.
+### GET /documents  
+Lista todos os documentos.
 
-Changes made via Lovable will be committed automatically to this repo.
-
-**Use your preferred IDE**
-
-If you want to work locally using your own IDE, you can clone this repo and push changes. Pushed changes will also be reflected in Lovable.
-
-The only requirement is having Node.js & npm installed - [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
-
-Follow these steps:
-
-```sh
-# Step 1: Clone the repository using the project's Git URL.
-git clone <YOUR_GIT_URL>
-
-# Step 2: Navigate to the project directory.
-cd <YOUR_PROJECT_NAME>
-
-# Step 3: Install the necessary dependencies.
-npm i
-
-# Step 4: Start the development server with auto-reloading and an instant preview.
-npm run dev
+- Response:
+  - 200 OK
+```json
+[
+  {
+    "id": "uuid",
+    "title": "string",
+    "status": "pending|signed"
+  }
+]
 ```
 
-**Edit a file directly in GitHub**
+---
 
-- Navigate to the desired file(s).
-- Click the "Edit" button (pencil icon) at the top right of the file view.
-- Make your changes and commit the changes.
+### GET /documents/{id}  
+Obtém os detalhes de um documento específico.
 
-**Use GitHub Codespaces**
+- Path Parameters:
+  - `id` (string, obrigatório) — ID do documento
 
-- Navigate to the main page of your repository.
-- Click on the "Code" button (green button) near the top right.
-- Select the "Codespaces" tab.
-- Click on "New codespace" to launch a new Codespace environment.
-- Edit files directly within the Codespace and commit and push your changes once you're done.
+- Response:
+  - 200 OK
+```json
+{
+  "id": "uuid",
+  "title": "string",
+  "content": "string",
+  "signers": [ ... ],
+  "status": "pending|signed"
+}
+```
+- Erros:
+  - 404 Not Found (documento não encontrado)
 
-## What technologies are used for this project?
+---
 
-This project is built with:
+### POST /documents/{id}/sign  
+Assina o documento.
 
-- Vite
-- TypeScript
-- React
-- shadcn-ui
-- Tailwind CSS
+- Path Parameters:
+  - `id` (string, obrigatório) — ID do documento
 
-## How can I deploy this project?
+- Request Body:
+```json
+{
+  "signerEmail": "string",
+  "signature": "string"
+}
+```
 
-Simply open [Lovable](https://lovable.dev/projects/ba2d72f5-85d0-4940-8798-b5a7b4bbf47d) and click on Share -> Publish.
+- Response:
+  - 200 OK
+```json
+{
+  "message": "Document signed successfully"
+}
+```
+- Erros:
+  - 400 Bad Request (dados inválidos)
+  - 404 Not Found (documento ou signatário não encontrado)
 
-## Can I connect a custom domain to my Lovable project?
+---
 
-Yes, you can!
+## Como rodar o projeto localmente
 
-To connect a domain, navigate to Project > Settings > Domains and click Connect Domain.
+1. Clone o repositório:  
+```
+git clone https://github.com/akaguiz/service-sign-system.git
+```
+2. Instale as dependências:  
+```
+npm install
+```
+3. Configure variáveis de ambiente, se necessário.
 
-Read more here: [Setting up a custom domain](https://docs.lovable.dev/tips-tricks/custom-domain#step-by-step-guide)
+4. Execute o servidor:  
+```
+npm start
+```
+5. A API estará disponível em `http://localhost:3000`
+
+---
+
+## Tecnologias usadas
+
+- Node.js  
+- Express  
+- [Adicionar banco de dados se houver]  
+- [Outras bibliotecas importantes]
+
